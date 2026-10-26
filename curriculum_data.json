@@ -1,0 +1,2482 @@
+[
+  {
+    "unit": 1,
+    "title": "Beginner Gamedev Logic & Variables",
+    "badge": "UNIT 1 · BEGINNER GAMEDEV LOGIC",
+    "desc": "Master player stats, damage calculations, boolean flags, and game loop timing.",
+    "colorClass": "u1",
+    "guidebook": {
+      "summary": "Foundations of C# primitive types, arithmetic, condition branches, and for/while loops in game scripts.",
+      "tips": [
+        "int stores whole numbers (health, ammo, gold) as 32-bit integers on the stack.",
+        "float stores fractional numbers (moveSpeed, timers, jumpForce) and needs an f suffix: 5.5f.",
+        "bool stores true/false flags for player state (isGrounded, isDead).",
+        "Time.deltaTime ensures movement speed is identical on 30 FPS and 144 FPS screens."
+      ]
+    },
+    "lessons": [
+      {
+        "id": "u1-n1",
+        "title": "Player Health & Damage Math",
+        "topic": "Variables",
+        "q": {
+          "char": "junior",
+          "speech": "Help me calculate the player's health after taking damage from a slime!",
+          "type": "multiple_choice",
+          "title": "Basic HP Subtraction",
+          "instruction": "What is printed to the Unity console?",
+          "code": "int maxHp = 100;\nint damage = 35;\nint currentHp = maxHp - damage;\n\nConsole.WriteLine(currentHp);",
+          "choices": [
+            "65",
+            "100",
+            "35",
+            "-35"
+          ],
+          "answer": 0,
+          "summary": "100 minus 35 is 65! Primitive ints store direct numerical values on the stack.",
+          "analogy": "Like subtracting hearts on your HUD when an enemy touches the collider.",
+          "memory": "STACK: [maxHp = 100], [damage = 35], [currentHp = 65]"
+        }
+      },
+      {
+        "id": "u1-n2",
+        "title": "If/Else Conditions & Game Flags",
+        "topic": "Logic",
+        "q": {
+          "char": "duo",
+          "speech": "Check if the game over screen triggers! Trace the boolean check.",
+          "type": "multiple_choice",
+          "title": "Game Over Check",
+          "instruction": "What will be output?",
+          "code": "int playerHp = 0;\nbool isGameOver = playerHp <= 0;\n\nif (isGameOver) {\n    Console.WriteLine(\"GAME OVER\");\n} else {\n    Console.WriteLine(\"ALIVE\");\n}",
+          "choices": [
+            "GAME OVER",
+            "ALIVE",
+            "null",
+            "Compilation Error"
+          ],
+          "answer": 0,
+          "summary": "playerHp <= 0 evaluates to true, so the if block executes.",
+          "analogy": "Triggering the respawn menu as soon as health hits zero.",
+          "memory": "isGameOver boolean is stored as a 1-byte true flag on the stack."
+        }
+      },
+      {
+        "id": "u1-n3",
+        "title": "Looping Through Spawn Points",
+        "topic": "Loops",
+        "q": {
+          "char": "duo",
+          "speech": "How many enemies get spawned by this for-loop?",
+          "type": "multiple_choice",
+          "title": "Enemy Spawner Loop",
+          "instruction": "What is the final count of enemies spawned?",
+          "code": "int enemiesSpawned = 0;\nfor (int i = 0; i < 4; i++) {\n    enemiesSpawned++;\n}\nConsole.WriteLine(enemiesSpawned);",
+          "choices": [
+            "4",
+            "3",
+            "5",
+            "0"
+          ],
+          "answer": 0,
+          "summary": "i loops through 0, 1, 2, 3 (4 iterations total), incrementing enemiesSpawned to 4.",
+          "analogy": "Spawning 4 zombies at wave start!",
+          "memory": "i starts at 0, increments until i reaches 4."
+        }
+      },
+      {
+        "id": "u1-n4",
+        "title": "Float Movement & Speed Scaling",
+        "topic": "Variables",
+        "q": {
+          "char": "junior",
+          "speech": "Why do we append 'f' to floating-point numbers in Unity C#?",
+          "type": "multiple_choice",
+          "title": "Float Literal Syntax",
+          "instruction": "Which line compiles without error for a float variable?",
+          "code": "// Choose the valid float assignment:\nfloat speed1 = 5.5;\nfloat speed2 = 5.5f;\nfloat speed3 = (int)5.5f;",
+          "choices": [
+            "float speed2 = 5.5f;",
+            "float speed1 = 5.5;",
+            "Neither compiles",
+            "Both speed1 and speed2"
+          ],
+          "answer": 0,
+          "summary": "In C#, bare decimal literals like 5.5 default to 64-bit double, requiring the f suffix for 32-bit float.",
+          "analogy": "Speed in Unity uses 32-bit floats for fast hardware acceleration on mobile GPUs.",
+          "memory": "32-bit IEEE 754 float on stack vs 64-bit double."
+        }
+      },
+      {
+        "id": "u1-n5",
+        "title": "Logical AND/OR in Combat",
+        "topic": "Logic",
+        "q": {
+          "char": "lily",
+          "speech": "Can the character execute a double jump here?",
+          "type": "multiple_choice",
+          "title": "Jump Condition Check",
+          "instruction": "What is the boolean result of canJump?",
+          "code": "bool isGrounded = false;\nint extraJumps = 1;\nbool canJump = isGrounded || extraJumps > 0;\nConsole.WriteLine(canJump);",
+          "choices": [
+            "True",
+            "False",
+            "null",
+            "0"
+          ],
+          "answer": 0,
+          "summary": "With || (OR), if either operand is true, the result is true. Since extraJumps > 0 is true, canJump is true.",
+          "analogy": "Mid-air double-jumping when you still have a feather power-up active.",
+          "memory": "Short-circuit evaluation: evaluates right side only when left is false."
+        }
+      },
+      {
+        "id": "u1-n6",
+        "title": "While Loops & Potion Draining",
+        "topic": "Loops",
+        "q": {
+          "char": "junior",
+          "speech": "Watch out for infinite loops! How many potions are consumed?",
+          "type": "multiple_choice",
+          "title": "While Loop Counter",
+          "instruction": "What does this print?",
+          "code": "int potions = 3;\nint drunk = 0;\nwhile (potions > 0) {\n    potions--;\n    drunk++;\n}\nConsole.WriteLine(drunk);",
+          "choices": [
+            "3",
+            "2",
+            "4",
+            "Infinite Loop"
+          ],
+          "answer": 0,
+          "summary": "The while loop executes 3 times until potions reaches 0, incrementing drunk to 3.",
+          "analogy": "Chugging healing potions one by one until your pouch is empty.",
+          "memory": "potions decrements: 3 -> 2 -> 1 -> 0; loop condition breaks at 0."
+        }
+      },
+      {
+        "id": "u1-n7",
+        "title": "String Interpolation & HUD Messages",
+        "topic": "Variables",
+        "q": {
+          "char": "lily",
+          "speech": "Format our HUD string with modern C# string interpolation!",
+          "type": "multiple_choice",
+          "title": "String Interpolation $\"\"",
+          "instruction": "Which syntax cleanly formats the player score into text?",
+          "code": "int score = 450;\n// What gives: \"Score: 450\"?",
+          "choices": [
+            "$\"Score: {score}\"",
+            "'Score: {score}'",
+            "\"Score: \" + {score}",
+            "@Score: (score)"
+          ],
+          "answer": 0,
+          "summary": "The $ prefix enables string interpolation, replacing {score} with its runtime value.",
+          "analogy": "Printing player stats on the top UI banner dynamically.",
+          "memory": "Compiles to String.Format or direct handler under the hood."
+        }
+      },
+      {
+        "id": "u1-n8",
+        "title": "Switch Statements & Weapon Types",
+        "topic": "Logic",
+        "q": {
+          "char": "vikram",
+          "speech": "Clean weapon state branching! Trace this switch statement.",
+          "type": "multiple_choice",
+          "title": "Switch Expression",
+          "instruction": "What damage value is assigned when weapon is \"Bow\"?",
+          "code": "string weapon = \"Bow\";\nint dmg = weapon switch {\n    \"Dagger\" => 10,\n    \"Bow\" => 25,\n    \"Hammer\" => 60,\n    _ => 5\n};\nConsole.WriteLine(dmg);",
+          "choices": [
+            "25",
+            "10",
+            "60",
+            "5"
+          ],
+          "answer": 0,
+          "summary": "The switch expression pattern matches \"Bow\" and returns 25.",
+          "analogy": "Equipping an arrow that deals 25 ranged damage instead of dagger damage.",
+          "memory": "Jump table / branch lookup generated by C# compiler."
+        }
+      },
+      {
+        "id": "u1-n9",
+        "title": "Array Indexing & Ammo Counts",
+        "topic": "Loops",
+        "q": {
+          "char": "junior",
+          "speech": "Array indices start at ZERO! What is ammo[1]?",
+          "type": "multiple_choice",
+          "title": "Zero-Indexed Arrays",
+          "instruction": "What value is stored at index 1?",
+          "code": "int[] ammo = new int[] { 30, 15, 6 };\nConsole.WriteLine(ammo[1]);",
+          "choices": [
+            "15",
+            "30",
+            "6",
+            "IndexOutOfRangeException"
+          ],
+          "answer": 0,
+          "summary": "Index 0 is 30, index 1 is 15, and index 2 is 6.",
+          "analogy": "Slot 0 is Rifle ammo, Slot 1 is Shotgun shells (15).",
+          "memory": "Fixed-size heap buffer: baseAddress + (1 * sizeof(int))."
+        }
+      },
+      {
+        "id": "u1-n10",
+        "title": "Unit 1 Milestone Trial: Dungeon Gatekeeper",
+        "topic": "Logic",
+        "q": {
+          "char": "duo",
+          "speech": "FINAL UNIT 1 BOSS TRIAL! Trace the full combat loop to defeat the gatekeeper!",
+          "type": "multiple_choice",
+          "title": "Boss Health Loop",
+          "instruction": "What is the final bossHp after 3 turns?",
+          "code": "int bossHp = 50;\nint swordDamage = 12;\nfor (int turn = 1; turn <= 3; turn++) {\n    bossHp -= swordDamage;\n}\nConsole.WriteLine(bossHp);",
+          "choices": [
+            "14",
+            "26",
+            "38",
+            "0"
+          ],
+          "answer": 0,
+          "summary": "50 - (3 * 12) = 50 - 36 = 14! The boss has 14 HP remaining.",
+          "analogy": "Striking a stone golem 3 times with a 12-power enchanted blade.",
+          "memory": "Accumulator variable decremented in local stack frame."
+        }
+      }
+    ]
+  },
+  {
+    "unit": 2,
+    "title": "Unity Engine Lifecycle & Architecture",
+    "badge": "UNIT 2 · UNITY ENGINE EXECUTION",
+    "desc": "Awake, Start, Update, FixedUpdate, Time.deltaTime, and 3D vector movement.",
+    "colorClass": "u2",
+    "guidebook": {
+      "summary": "Understanding when Unity calls your methods, frame rates, and game physics step.",
+      "tips": [
+        "Awake() runs when the GameObject loads (initialize self references here).",
+        "Start() runs before the first frame update (initialize links to other objects here).",
+        "Update() runs once per graphical frame (handle user input and animations here).",
+        "FixedUpdate() runs at a constant physics interval (apply Rigidbody forces and velocities here)."
+      ]
+    },
+    "lessons": [
+      {
+        "id": "u2-n1",
+        "title": "Awake vs Start Execution Order",
+        "topic": "Engine",
+        "q": {
+          "char": "vikram",
+          "speech": "Why should you find components in Awake() rather than Start()?",
+          "type": "multiple_choice",
+          "title": "Component Initialization Order",
+          "instruction": "Which method is guaranteed to run BEFORE any other script Start() method?",
+          "code": "void Awake() {\n    rb = GetComponent<Rigidbody>();\n}\nvoid Start() {\n    rb.linearVelocity = Vector3.forward * 5f;\n}",
+          "choices": [
+            "Awake()",
+            "Start()",
+            "Update()",
+            "OnEnable() only"
+          ],
+          "answer": 0,
+          "summary": "All Awake() calls across all active scripts finish before any Start() method is invoked.",
+          "analogy": "Building all the stage props before the actors enter for opening night.",
+          "memory": "Unity native C++ engine dispatches Awake pass across active scene components."
+        }
+      },
+      {
+        "id": "u2-n2",
+        "title": "Update vs FixedUpdate Physics",
+        "topic": "Engine",
+        "q": {
+          "char": "junior",
+          "speech": "I moved my Rigidbody inside Update() and it vibrated crazy! Where does physics belong?",
+          "type": "multiple_choice",
+          "title": "Physics Stepping",
+          "instruction": "Which Unity lifecycle method synchronizes with the PhysX simulation clock?",
+          "code": "// Move Rigidbody here:\nvoid FixedUpdate() {\n    rb.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);\n}",
+          "choices": [
+            "FixedUpdate()",
+            "Update()",
+            "LateUpdate()",
+            "OnGUI()"
+          ],
+          "answer": 0,
+          "summary": "FixedUpdate runs at a locked deterministic physics tick (default 50Hz, 0.02s).",
+          "analogy": "Physics engine needs a steady metronome so balls bounce predictably.",
+          "memory": "PhysX solver advances in discrete time steps decoupled from render FPS."
+        }
+      },
+      {
+        "id": "u2-n3",
+        "title": "LateUpdate & Smooth Camera Follow",
+        "topic": "Engine",
+        "q": {
+          "char": "lily",
+          "speech": "Why does camera tracking code go into LateUpdate()?",
+          "type": "multiple_choice",
+          "title": "Camera Tracking Jitter Prevention",
+          "instruction": "What ensures the camera moves AFTER the player character has finished moving?",
+          "code": "void LateUpdate() {\n    transform.position = player.position + offset;\n}",
+          "choices": [
+            "LateUpdate executes after all Update() methods finish",
+            "LateUpdate runs on a separate GPU thread",
+            "LateUpdate is faster than Update",
+            "LateUpdate runs only when camera stops"
+          ],
+          "answer": 0,
+          "summary": "LateUpdate() is called on every frame after all Update() functions have executed.",
+          "analogy": "A film cameraman following the lead actor only after the actor takes their step.",
+          "memory": "Unity engine loop queue: Input -> Update -> Physics -> LateUpdate -> Render."
+        }
+      },
+      {
+        "id": "u2-n4",
+        "title": "Time.deltaTime Explained",
+        "topic": "Engine",
+        "q": {
+          "char": "junior",
+          "speech": "Without Time.deltaTime, my spaceship flies 10x faster on a gaming PC! Why?",
+          "type": "multiple_choice",
+          "title": "Frame Rate Independence",
+          "instruction": "What does Time.deltaTime represent in Unity?",
+          "code": "transform.Translate(Vector3.forward * speed * Time.deltaTime);",
+          "choices": [
+            "Elapsed seconds between current and previous frame",
+            "The target frame rate (e.g. 60)",
+            "Total seconds since game started",
+            "The physics fixed interval (0.02)"
+          ],
+          "answer": 0,
+          "summary": "Time.deltaTime is the fraction of a second that elapsed since the last render frame.",
+          "analogy": "Multiplying by deltaTime converts speed from \"units per frame\" to \"units per second\".",
+          "memory": "At 60 FPS, deltaTime is ~0.0166s. At 120 FPS, deltaTime is ~0.0083s."
+        }
+      },
+      {
+        "id": "u2-n5",
+        "title": "Vector3 Movement Math",
+        "topic": "Engine",
+        "q": {
+          "char": "vikram",
+          "speech": "Calculate moving toward a target direction!",
+          "type": "multiple_choice",
+          "title": "Direction Vector Formula",
+          "instruction": "How do you calculate the direction vector from Player to Enemy?",
+          "code": "Vector3 playerPos = new Vector3(0, 0, 0);\nVector3 enemyPos = new Vector3(3, 0, 4);",
+          "choices": [
+            "enemyPos - playerPos",
+            "playerPos + enemyPos",
+            "playerPos * enemyPos",
+            "enemyPos / playerPos"
+          ],
+          "answer": 0,
+          "summary": "Target minus Origin gives the vector pointing from origin to target: (B - A).",
+          "analogy": "Aiming an arrow from where you stand towards the monster.",
+          "memory": "Component-wise subtraction: (3-0, 0-0, 4-0) = Vector3(3, 0, 4)."
+        }
+      },
+      {
+        "id": "u2-n6",
+        "title": "Vector2 Top-Down Velocity",
+        "topic": "Engine",
+        "q": {
+          "char": "junior",
+          "speech": "In 2D games, which component handles velocity on a Rigidbody2D?",
+          "type": "multiple_choice",
+          "title": "2D Rigidbody Linear Velocity",
+          "instruction": "How do you set velocity in Unity 2023+ / 6 for 2D movement?",
+          "code": "rb2d.linearVelocity = moveInput * moveSpeed;",
+          "choices": [
+            "linearVelocity",
+            "angularDrag",
+            "gravityScale",
+            "inertia"
+          ],
+          "answer": 0,
+          "summary": "rb2d.linearVelocity (formerly velocity) directly dictates unit movement per second.",
+          "analogy": "Pushing the joystick in a top-down dungeon crawler like Zelda.",
+          "memory": "Box2D physics solver updates position based on linearVelocity * fixedDeltaTime."
+        }
+      },
+      {
+        "id": "u2-n7",
+        "title": "Transform Parent & Coordinate Spaces",
+        "topic": "Engine",
+        "q": {
+          "char": "lily",
+          "speech": "TransformPoint converts local coordinates to what coordinate space?",
+          "type": "multiple_choice",
+          "title": "Local to World Space Conversion",
+          "instruction": "What does transform.TransformPoint(Vector3.forward) return?",
+          "code": "Vector3 worldMuzzle = gunTransform.TransformPoint(Vector3.forward * 2f);",
+          "choices": [
+            "World space coordinates relative to scene origin",
+            "Screen pixel coordinates",
+            "Local space coordinates of parent",
+            "Normalized viewport coordinates"
+          ],
+          "answer": 0,
+          "summary": "TransformPoint transforms position from local space to world space taking rotation into account.",
+          "analogy": "Finding where the gun barrel tip is in the entire game world to spawn a muzzle flash.",
+          "memory": "Multiplies local vector by GameObject 4x4 localToWorldMatrix."
+        }
+      },
+      {
+        "id": "u2-n8",
+        "title": "Quaternion Rotation & Slerp",
+        "topic": "Engine",
+        "q": {
+          "char": "vikram",
+          "speech": "Why does Unity use Quaternions instead of Euler angles (x, y, z) for 3D rotations?",
+          "type": "multiple_choice",
+          "title": "Gimbal Lock Prevention",
+          "instruction": "What fatal mathematical flaw do Quaternions avoid?",
+          "code": "transform.rotation = Quaternion.LookRotation(moveDirection);",
+          "choices": [
+            "Gimbal Lock (loss of a degree of freedom)",
+            "Division by zero in CPU cache",
+            "Heap allocations in garbage collection",
+            "Texture distortion on shaders"
+          ],
+          "answer": 0,
+          "summary": "Euler angles suffer from Gimbal Lock when two rotational axes align. Quaternions (4D hypercomplex numbers) eliminate this completely.",
+          "analogy": "Smoothly rotating an airplane nose without the compass spinning wildly.",
+          "memory": "Stores 4 components (x, y, z, w) as a normalized 4D rotation sphere."
+        }
+      },
+      {
+        "id": "u2-n9",
+        "title": "OnEnable & OnDisable Cleanup",
+        "topic": "Engine",
+        "q": {
+          "char": "duo",
+          "speech": "What happens if you subscribe to an event in OnEnable but forget OnDisable?",
+          "type": "multiple_choice",
+          "title": "Event Listener Ghost Leak",
+          "instruction": "What critical bug occurs when you do not unsubscribe in OnDisable?",
+          "code": "void OnEnable() { GameManager.OnScoreChanged += UpdateScoreUI; }\nvoid OnDisable() { GameManager.OnScoreChanged -= UpdateScoreUI; }",
+          "choices": [
+            "Memory leak and MissingReferenceException when object is destroyed",
+            "Compile error in Visual Studio",
+            "Unity editor crashes immediately",
+            "Score freezes at zero"
+          ],
+          "answer": 0,
+          "summary": "Static or publisher events retain a reference to your object, causing zombie callbacks after destruction.",
+          "analogy": "Leaving your phone number on a company call list after you move out.",
+          "memory": "Delegate invocation list retains strong reference preventing Garbage Collection."
+        }
+      },
+      {
+        "id": "u2-n10",
+        "title": "Unit 2 Milestone Trial: Engine Master Trial",
+        "topic": "Engine",
+        "q": {
+          "char": "vikram",
+          "speech": "CHALLENGE BOSS: Correctly order the Unity engine execution lifecycle from first to last!",
+          "type": "multiple_choice",
+          "title": "Engine Lifecycle Sequence",
+          "instruction": "Which sequence correctly matches the exact Unity event order?",
+          "code": "// Choose the exact sequence of execution:",
+          "choices": [
+            "Awake -> OnEnable -> Start -> FixedUpdate -> Update -> LateUpdate",
+            "Start -> Awake -> Update -> FixedUpdate -> LateUpdate",
+            "Update -> FixedUpdate -> Awake -> Start",
+            "OnEnable -> Awake -> Start -> Update"
+          ],
+          "answer": 0,
+          "summary": "Awake runs first upon loading, then OnEnable, then Start, then FixedUpdate loop, Update, and LateUpdate.",
+          "analogy": "The holy scriptures of the Unity Script Lifecycle flowchart!",
+          "memory": "Native C++ dispatcher invokes managed method table in strict pipeline order."
+        }
+      }
+    ]
+  },
+  {
+    "unit": 3,
+    "title": "Object-Oriented Gamedev & Memory Models",
+    "badge": "UNIT 3 · OOP & MEMORY IN UNITY",
+    "desc": "Classes vs Structs, Heap vs Stack, Encapsulation, Polymorphism, and Interfaces.",
+    "colorClass": "u3",
+    "guidebook": {
+      "summary": "Distinguish value types from reference types to eliminate memory aliasing bugs in game code.",
+      "tips": [
+        "class is a reference type allocated on the Heap (variables hold memory addresses).",
+        "struct is a value type allocated on the Stack or inline (variables hold actual data).",
+        "Never use \"new MonoBehaviour()\"; always use AddComponent<T>() or Instantiate().",
+        "Interfaces like IDamageable allow swords, spells, and explosions to damage anything that can be hurt."
+      ]
+    },
+    "lessons": [
+      {
+        "id": "u3-n1",
+        "title": "Classes vs Structs: Value vs Reference",
+        "topic": "OOP",
+        "q": {
+          "char": "junior",
+          "speech": "I copied player position into targetPos, modified targetPos, and player didn't move! Why?",
+          "type": "multiple_choice",
+          "title": "Struct Value Copying",
+          "instruction": "Because Vector3 is a struct (value type), what happens during assignment?",
+          "code": "Vector3 a = new Vector3(1, 2, 3);\nVector3 b = a;\nb.x = 99;\nConsole.WriteLine(a.x);",
+          "choices": [
+            "1 (a is unchanged, b is an independent copy)",
+            "99 (both point to same memory)",
+            "0",
+            "NullReferenceException"
+          ],
+          "answer": 0,
+          "summary": "Structs are copied by value! Modifying b.x has zero effect on a.x.",
+          "analogy": "Photocopying a quest map: drawing on your copy does not alter the original.",
+          "memory": "Bitwise 12-byte copy on the stack frame (4 bytes for x, y, z each)."
+        }
+      },
+      {
+        "id": "u3-n2",
+        "title": "Reference Aliasing Bug",
+        "topic": "OOP",
+        "q": {
+          "char": "duo",
+          "speech": "BUG ALERT! Two goblins are sharing the same weapon stats object!",
+          "type": "multiple_choice",
+          "title": "Class Reference Aliasing",
+          "instruction": "What is printed when goblinA damages its weapon class?",
+          "code": "class Weapon { public int durability = 100; }\nWeapon sharedSword = new Weapon();\nWeapon swordA = sharedSword;\nWeapon swordB = sharedSword;\nswordA.durability = 20;\nConsole.WriteLine(swordB.durability);",
+          "choices": [
+            "20 (both variables point to the exact same Heap object)",
+            "100",
+            "80",
+            "0"
+          ],
+          "answer": 0,
+          "summary": "Classes are reference types! swordA and swordB hold references to the exact same Heap address.",
+          "analogy": "Two players with shortcuts on their desktop pointing to the same server file.",
+          "memory": "HEAP: [Weapon @ 0x8800 {durability: 20}]. STACK: swordA -> 0x8800, swordB -> 0x8800."
+        }
+      },
+      {
+        "id": "u3-n3",
+        "title": "Encapsulation & [SerializeField]",
+        "topic": "OOP",
+        "q": {
+          "char": "lily",
+          "speech": "How do you expose a variable in the Unity Inspector without making it public?",
+          "type": "multiple_choice",
+          "title": "Encapsulation Best Practice",
+          "instruction": "Which attribute exposes private variables safely to game designers?",
+          "code": "[SerializeField] private float jumpForce = 12f;",
+          "choices": [
+            "[SerializeField]",
+            "[System.Serializable]",
+            "[HideInInspector]",
+            "[ExposeToEngine]"
+          ],
+          "answer": 0,
+          "summary": "[SerializeField] tells Unity serializer to save the field and display it in Inspector while keeping it private.",
+          "analogy": "Letting the level designer tweak jump height without letting other scripts mess with it.",
+          "memory": "Unity YAML serializer reads private member via metadata reflection."
+        }
+      },
+      {
+        "id": "u3-n4",
+        "title": "C# Properties & Health Clamping",
+        "topic": "OOP",
+        "q": {
+          "char": "junior",
+          "speech": "Prevent player health from exceeding maxHealth using a C# property!",
+          "type": "multiple_choice",
+          "title": "Property Clamping",
+          "instruction": "What does this property ensure when healing?",
+          "code": "private int _hp;\npublic int Health {\n    get => _hp;\n    set => _hp = Math.Clamp(value, 0, 100);\n}",
+          "choices": [
+            "Health never goes below 0 or above 100",
+            "Health resets to 0 every frame",
+            "Max health increases to 200",
+            "Throws ArgumentOutOfRangeException"
+          ],
+          "answer": 0,
+          "summary": "The setter encapsulates logic, clamping incoming values within the allowed range.",
+          "analogy": "A water bottle that overflows excess water instead of breaking.",
+          "memory": "Property compiles into get_Health() and set_Health(int value) methods."
+        }
+      },
+      {
+        "id": "u3-n5",
+        "title": "Why new MonoBehaviour() is Forbidden",
+        "topic": "OOP",
+        "q": {
+          "char": "vikram",
+          "speech": "What happens if a beginner writes 'PlayerController pc = new PlayerController();'?",
+          "type": "multiple_choice",
+          "title": "MonoBehaviour Instantiation Rules",
+          "instruction": "Why does Unity throw a warning when you use \"new\" on a MonoBehaviour?",
+          "code": "// WRONG: new PlayerMovement();\n// RIGHT: gameObject.AddComponent<PlayerMovement>();",
+          "choices": [
+            "MonoBehaviours require Unity native C++ GameObject bindings and lifecycle hooks",
+            "MonoBehaviour is an abstract interface",
+            "new is not a valid C# keyword",
+            "It takes too much stack memory"
+          ],
+          "answer": 0,
+          "summary": "MonoBehaviours are tied to GameObject transforms and native engine updates; they must be attached via AddComponent.",
+          "analogy": "You cannot start an engine without bolting it inside a car chassis.",
+          "memory": "Instantiate or AddComponent allocates the native C++ wrapper linked to managed C# peer."
+        }
+      },
+      {
+        "id": "u3-n6",
+        "title": "Inheritance: Base Enemy Hierarchy",
+        "topic": "OOP",
+        "q": {
+          "char": "junior",
+          "speech": "Code re-use in game architecture! Trace this class hierarchy.",
+          "type": "multiple_choice",
+          "title": "Class Inheritance",
+          "instruction": "Does Goblin have access to the TakeDamage method defined in Enemy?",
+          "code": "public class Enemy : MonoBehaviour {\n    public void TakeDamage(int dmg) { /* subtract */ }\n}\npublic class Goblin : Enemy {\n    // empty\n}",
+          "choices": [
+            "Yes, Goblin inherits all public and protected members of Enemy",
+            "No, Goblin must declare its own TakeDamage",
+            "Only if Enemy is an interface",
+            "Only if Goblin uses [SerializeField]"
+          ],
+          "answer": 0,
+          "summary": "Subclasses inherit public and protected members of their parent base class.",
+          "analogy": "All enemies take damage, but Goblins can also steal your gold!",
+          "memory": "Goblin type descriptor inherits virtual method table (vtable) from Enemy."
+        }
+      },
+      {
+        "id": "u3-n7",
+        "title": "Virtual & Override Methods",
+        "topic": "OOP",
+        "q": {
+          "char": "vikram",
+          "speech": "How do you allow a child enemy class to change how it attacks?",
+          "type": "multiple_choice",
+          "title": "Polymorphism Keywords",
+          "instruction": "Which keywords enable dynamic method overriding in C#?",
+          "code": "public class BaseEnemy {\n    public virtual void Attack() { Console.WriteLine(\"Punch\"); }\n}\npublic class MageEnemy : BaseEnemy {\n    public override void Attack() { Console.WriteLine(\"Fireball\"); }\n}",
+          "choices": [
+            "virtual in base class, override in child class",
+            "static in base class, const in child class",
+            "abstract in base, sealed in child",
+            "interface in base, struct in child"
+          ],
+          "answer": 0,
+          "summary": "virtual marks a method as overrideable; override replaces the implementation in the derived class.",
+          "analogy": "Standard monsters punch, but Dragon bosses breathe fire when Attack() is called!",
+          "memory": "VTable slot for Attack points to MageEnemy.Attack at runtime."
+        }
+      },
+      {
+        "id": "u3-n8",
+        "title": "Abstract Classes & Weapon Archetypes",
+        "topic": "OOP",
+        "q": {
+          "char": "lily",
+          "speech": "Can you instantiate an abstract class directly?",
+          "type": "multiple_choice",
+          "title": "Abstract Class Blueprint",
+          "instruction": "Can you call new BaseWeapon() if BaseWeapon is declared abstract?",
+          "code": "public abstract class BaseWeapon {\n    public abstract void Fire();\n}",
+          "choices": [
+            "No, abstract classes cannot be instantiated, only inherited",
+            "Yes, anytime",
+            "Yes, if it has a constructor",
+            "Only inside Update()"
+          ],
+          "answer": 0,
+          "summary": "Abstract classes serve as blueprints and require concrete derived classes to implement abstract members.",
+          "analogy": "You cannot hold an \"abstract weapon\" in your hand; you hold a Pistol or Shotgun.",
+          "memory": "Compiler rejects direct instantiation of incomplete type descriptors."
+        }
+      },
+      {
+        "id": "u3-n9",
+        "title": "Interfaces: IDamageable Decoupling",
+        "topic": "OOP",
+        "q": {
+          "char": "duo",
+          "speech": "Why use an IDamageable interface instead of checking 'if (target is Enemy)'?",
+          "type": "multiple_choice",
+          "title": "Interface Decoupling",
+          "instruction": "What is the main architectural benefit of an IDamageable interface?",
+          "code": "public interface IDamageable {\n    void TakeDamage(int amount);\n}",
+          "choices": [
+            "Any entity (Enemy, Wooden Crate, Exploding Barrel) can take damage without code coupling",
+            "Interfaces run 10x faster than classes",
+            "Interfaces save battery on mobile devices",
+            "Interfaces automatically play particle effects"
+          ],
+          "answer": 0,
+          "summary": "Interfaces allow unrelated classes to implement a common contract, decoupling weapons from target types.",
+          "analogy": "Your rocket launcher damages tanks, zombies, and wooden doors with the same code!",
+          "memory": "Interface dispatch uses interface vtable (itable) lookup."
+        }
+      },
+      {
+        "id": "u3-n10",
+        "title": "Unit 3 Milestone Trial: Architecture Arena",
+        "topic": "OOP",
+        "q": {
+          "char": "duo",
+          "speech": "OOP ARCHITECTURE TRIAL! What is output when we iterate through damageables?",
+          "type": "multiple_choice",
+          "title": "Polymorphic Interface Loop",
+          "instruction": "What gets executed when bullet hits targets via IDamageable?",
+          "code": "IDamageable[] targets = new IDamageable[] { new Player(), new DestructibleDoor() };\nforeach(var t in targets) {\n    t.TakeDamage(10);\n}",
+          "choices": [
+            "Each target executes its own specific TakeDamage implementation",
+            "Compilation error: Cannot loop interfaces",
+            "Only Player takes damage",
+            "DestructibleDoor casts to Player"
+          ],
+          "answer": 0,
+          "summary": "Polymorphism allows treating different types uniformly through their shared interface contract.",
+          "analogy": "The game world treats anything destructible with one elegant line of code.",
+          "memory": "Dynamic dispatch via itable resolves the appropriate TakeDamage method address."
+        }
+      }
+    ]
+  },
+  {
+    "unit": 4,
+    "title": "Game Math, 3D Physics & Collisions",
+    "badge": "UNIT 4 · MATH, PHYSICS & RAYCASTING",
+    "desc": "Rigidbodies, Colliders, Raycasts, Dot Product vision cones, and Vector Math.",
+    "colorClass": "u4",
+    "guidebook": {
+      "summary": "Harness Unity physics simulation and 3D vector geometry for combat, movement, and collisions.",
+      "tips": [
+        "Use ForceMode.Impulse for instant explosive forces (jumping, cannon shot).",
+        "Use ForceMode.Force for continuous acceleration (jetpack thrust).",
+        "Vector3.Dot gives positive values when facing the same direction, negative when facing away.",
+        "Use Physics.Raycast with a LayerMask so bullets do not collide with the player shooting them."
+      ]
+    },
+    "lessons": [
+      {
+        "id": "u4-n1",
+        "title": "Rigidbody AddForce: Impulse vs Force",
+        "topic": "Physics",
+        "q": {
+          "char": "junior",
+          "speech": "Which ForceMode should we use when the hero jumps?",
+          "type": "multiple_choice",
+          "title": "Instant Impulse Force",
+          "instruction": "Which ForceMode applies an instantaneous change in momentum using mass?",
+          "code": "rb.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);",
+          "choices": [
+            "ForceMode.Impulse",
+            "ForceMode.Force",
+            "ForceMode.Acceleration",
+            "ForceMode.VelocityChange"
+          ],
+          "answer": 0,
+          "summary": "ForceMode.Impulse applies an instant force taking mass into account, perfect for jumps and explosions.",
+          "analogy": "A sudden spring releasing under your boots to vault you upward.",
+          "memory": "Directly adjusts Rigidbody momentum vector: deltaV = impulse / mass."
+        }
+      },
+      {
+        "id": "u4-n2",
+        "title": "Colliders vs Triggers",
+        "topic": "Physics",
+        "q": {
+          "char": "lily",
+          "speech": "Why didn't my player pick up the coin when walking into it?",
+          "type": "multiple_choice",
+          "title": "Trigger Collider Setup",
+          "instruction": "To detect overlaps without causing a physical solid collision, what checkbox must be checked on the Collider?",
+          "code": "void OnTriggerEnter(Collider other) {\n    if (other.CompareTag(\"Coin\")) CollectCoin();\n}",
+          "choices": [
+            "Is Trigger",
+            "Is Kinematic",
+            "Used by Effector",
+            "Convex"
+          ],
+          "answer": 0,
+          "summary": "Is Trigger turns off physical solid collision response and triggers OnTriggerEnter/Stay/Exit callbacks.",
+          "analogy": "Walking through a ghost doorway that counts your visit without stubbing your toe.",
+          "memory": "PhysX broadphase logs overlap event without generating contact manifolds or solver forces."
+        }
+      },
+      {
+        "id": "u4-n3",
+        "title": "Raycasting 101: Physics.Raycast",
+        "topic": "Physics",
+        "q": {
+          "char": "vikram",
+          "speech": "Shoot a laser from the player's eyes forward! What does Physics.Raycast return?",
+          "type": "multiple_choice",
+          "title": "Raycast Boolean Return",
+          "instruction": "What is the return type of Physics.Raycast?",
+          "code": "bool hasHit = Physics.Raycast(transform.position, transform.forward, out RaycastHit hit, 100f);",
+          "choices": [
+            "bool (true if the ray intersected any matching collider)",
+            "RaycastHit object directly",
+            "float distance",
+            "void"
+          ],
+          "answer": 0,
+          "summary": "Physics.Raycast returns a bool indicating whether a collider was hit; details are stored in the out hit parameter.",
+          "analogy": "Shooting an invisible laser pointer: either the red dot hits a wall or it travels into the sky.",
+          "memory": "PhysX spatial bounding volume hierarchy (BVH) traversal test."
+        }
+      },
+      {
+        "id": "u4-n4",
+        "title": "RaycastHit & Surface Normals",
+        "topic": "Physics",
+        "q": {
+          "char": "junior",
+          "speech": "We want bullets to ricochet off metal walls! Which property of RaycastHit gives the surface tilt?",
+          "type": "multiple_choice",
+          "title": "Surface Normal Vector",
+          "instruction": "Which vector is perpendicular to the hit surface?",
+          "code": "Vector3 reflectDir = Vector3.Reflect(bulletDir, hit.normal);",
+          "choices": [
+            "hit.normal",
+            "hit.point",
+            "hit.distance",
+            "hit.barycentricCoordinate"
+          ],
+          "answer": 0,
+          "summary": "hit.normal is a unit vector perpendicular to the triangle surface where the ray intersected.",
+          "analogy": "Like an arrow pointing straight out of a wall at a 90 degree angle.",
+          "memory": "Interpolated normal vector from polygon mesh contact plane."
+        }
+      },
+      {
+        "id": "u4-n5",
+        "title": "LayerMasks & Bitmask Filtering",
+        "topic": "Physics",
+        "q": {
+          "char": "duo",
+          "speech": "Prevent raycasts from hitting your own player collider!",
+          "type": "multiple_choice",
+          "title": "LayerMask Bitshift",
+          "instruction": "How do you create a LayerMask integer for the \"Enemy\" layer (layer index 8)?",
+          "code": "int layerMask = 1 << LayerMask.NameToLayer(\"Enemy\");",
+          "choices": [
+            "1 << LayerMask.NameToLayer(\"Enemy\")",
+            "LayerMask.NameToLayer(\"Enemy\")",
+            "8 * 2",
+            "LayerMask.EnemyOnly"
+          ],
+          "answer": 0,
+          "summary": "Bit shifting 1 << layerIndex produces a 32-bit bitmask where only bit 8 is turned on (value 256).",
+          "analogy": "Wearing night-vision goggles tuned strictly to the frequency of enemy heat signatures.",
+          "memory": "32-bit integer bitwise AND filter used in PhysX collision pipeline."
+        }
+      },
+      {
+        "id": "u4-n6",
+        "title": "Distance Checks: sqrMagnitude vs Distance",
+        "topic": "Physics",
+        "q": {
+          "char": "vikram",
+          "speech": "PRO OPTIMIZATION! Checking distances between 500 enemies every frame!",
+          "type": "multiple_choice",
+          "title": "Square Distance Optimization",
+          "instruction": "Why is (a - b).sqrMagnitude faster than Vector3.Distance(a, b)?",
+          "code": "float distSqr = (enemy.position - player.position).sqrMagnitude;\nif (distSqr < range * range) { /* In range! */ }",
+          "choices": [
+            "It avoids calculating an expensive square root (Mathf.Sqrt)",
+            "It allocates less heap memory",
+            "It runs on the audio processor",
+            "It automatically multithreads"
+          ],
+          "answer": 0,
+          "summary": "Square root calculations are slow on CPUs. Comparing squared distance to squared range yields the exact same result without sqrt!",
+          "analogy": "Testing if x^2 + y^2 < 25 instead of calculating sqrt(x^2 + y^2) < 5.",
+          "memory": "Eliminates dozens of CPU floating-point sqrt instruction cycles per frame."
+        }
+      },
+      {
+        "id": "u4-n7",
+        "title": "Dot Product: Vision Cones & Stealth",
+        "topic": "Physics",
+        "q": {
+          "char": "lily",
+          "speech": "Can the guard see the sneaking thief?",
+          "type": "multiple_choice",
+          "title": "Vector3.Dot Vision Cone",
+          "instruction": "When Vector3.Dot(guardForward, dirToThief) is greater than 0, where is the thief?",
+          "code": "float dot = Vector3.Dot(guard.forward, dirToThief);\nbool inFront = dot > 0f;",
+          "choices": [
+            "In front of the guard (angle < 90 degrees)",
+            "Behind the guard",
+            "Directly to the guard left",
+            "Invisible"
+          ],
+          "answer": 0,
+          "summary": "The Dot product of two normalized vectors equals cos(angle). If dot > 0, the target is in the front 180-degree hemisphere.",
+          "analogy": "A guard cone of sight: if dot > 0.707, they are within a 90-degree forward vision cone!",
+          "memory": "Calculation: (ax*bx + ay*by + az*bz)."
+        }
+      },
+      {
+        "id": "u4-n8",
+        "title": "Cross Product: Perpendicular Axes",
+        "topic": "Physics",
+        "q": {
+          "char": "vikram",
+          "speech": "Find the rotational axis when steering a tank along a hillside!",
+          "type": "multiple_choice",
+          "title": "Cross Product Direction",
+          "instruction": "What is the geometric relationship of Vector3.Cross(A, B) to vectors A and B?",
+          "code": "Vector3 torqueAxis = Vector3.Cross(transform.forward, slopeNormal);",
+          "choices": [
+            "Perpendicular (orthogonal) to both vectors A and B",
+            "Parallel to vector A",
+            "Sum of lengths of A and B",
+            "Opposite of vector B"
+          ],
+          "answer": 0,
+          "summary": "The Cross product produces a vector that is perpendicular to both input vectors (right-hand rule).",
+          "analogy": "The axle of a spinning wheel is perpendicular to both its spokes and its direction of travel.",
+          "memory": "Determinant cross-multiplication: (ay*bz - az*by, az*bx - ax*bz, ax*by - ay*bx)."
+        }
+      },
+      {
+        "id": "u4-n9",
+        "title": "Interpolation: Mathf.Lerp & SmoothDamp",
+        "topic": "Physics",
+        "q": {
+          "char": "junior",
+          "speech": "Smoothly glide a health bar fill amount!",
+          "type": "multiple_choice",
+          "title": "Linear Interpolation (Lerp)",
+          "instruction": "What does Mathf.Lerp(0f, 100f, 0.5f) return?",
+          "code": "float current = Mathf.Lerp(0f, 100f, 0.5f);",
+          "choices": [
+            "50f",
+            "0f",
+            "100f",
+            "25f"
+          ],
+          "answer": 0,
+          "summary": "Mathf.Lerp(a, b, t) calculates a + (b - a) * t. At t = 0.5f, it is exactly halfway (50f).",
+          "analogy": "Sliding a dimmer switch halfway between pitch black (0) and maximum brightness (100).",
+          "memory": "Single multiply-add floating point operation."
+        }
+      },
+      {
+        "id": "u4-n10",
+        "title": "Unit 4 Milestone Trial: Physics Gatekeeper",
+        "topic": "Physics",
+        "q": {
+          "char": "duo",
+          "speech": "PHYSICS MILESTONE BOSS! Find the error in this ground-check raycast script!",
+          "type": "multiple_choice",
+          "title": "Ground Check Raycast Bug",
+          "instruction": "Why did the character fail to jump when standing on the ground?",
+          "code": "// Ground check attempt:\nbool isGrounded = Physics.Raycast(transform.position, Vector3.up, 1.1f);",
+          "choices": [
+            "The ray was cast Vector3.up instead of Vector3.down!",
+            "Physics.Raycast cannot take floats",
+            "isGrounded must be a class",
+            "Vector3.up is null"
+          ],
+          "answer": 0,
+          "summary": "Vector3.up casts into the sky! Ground checks must cast downwards (Vector3.down or -transform.up).",
+          "analogy": "Looking at the ceiling to check if your feet are touching the floor!",
+          "memory": "Ray direction vector (0, 1, 0) points away from ground plane."
+        }
+      }
+    ]
+  },
+  {
+    "unit": 5,
+    "title": "Collections, Data Structures & Inventory",
+    "badge": "UNIT 5 · DATA STRUCTURES & INVENTORY",
+    "desc": "Lists, Dictionaries, HashSets, Queues, Stacks, 2D Grids, and GC-safe iterations.",
+    "colorClass": "u5",
+    "guidebook": {
+      "summary": "Pick the optimal collection for your game systems: O(1) lookups with Dictionaries, fast queues, and avoiding GC garbage.",
+      "tips": [
+        "List<T> is great for dynamic collections, but resizing copies the internal array.",
+        "Dictionary<TKey, TValue> provides near O(1) lookups by item ID or name.",
+        "Queue<T> provides FIFO (First-In, First-Out) queuing for combat action buffers.",
+        "Avoid LINQ statements (.Where, .ToList) inside 60fps Update loops to prevent GC frame stutters."
+      ]
+    },
+    "lessons": [
+      {
+        "id": "u5-n1",
+        "title": "List<T> Dynamic Inventory",
+        "topic": "Collections",
+        "q": {
+          "char": "junior",
+          "speech": "Add loot drops into player bag!",
+          "type": "multiple_choice",
+          "title": "List Add & Count",
+          "instruction": "What is items.Count after this code executes?",
+          "code": "List<string> bag = new List<string>();\nbag.Add(\"Health Potion\");\nbag.Add(\"Iron Key\");\nbag.Remove(\"Iron Key\");\nConsole.WriteLine(bag.Count);",
+          "choices": [
+            "1",
+            "2",
+            "0",
+            "3"
+          ],
+          "answer": 0,
+          "summary": "Adding two items and removing one leaves exactly 1 item in the list.",
+          "analogy": "Picking up a key, opening a dungeon gate (consuming the key), leaving only your potion.",
+          "memory": "Internal array shifts elements; Count property decrements."
+        }
+      },
+      {
+        "id": "u5-n2",
+        "title": "Dictionary<TKey, TValue> Item Lookups",
+        "topic": "Collections",
+        "q": {
+          "char": "vikram",
+          "speech": "Instant item lookup without searching through 1,000 array elements!",
+          "type": "multiple_choice",
+          "title": "Dictionary O(1) Speed",
+          "instruction": "What is the average time complexity of finding a value in a Dictionary by Key?",
+          "code": "Dictionary<string, int> itemPrices = new Dictionary<string, int>();\nitemPrices[\"Sword\"] = 150;\nint price = itemPrices[\"Sword\"];",
+          "choices": [
+            "O(1) constant time",
+            "O(N) linear time",
+            "O(N^2) quadratic time",
+            "O(log N)"
+          ],
+          "answer": 0,
+          "summary": "Dictionaries use hash tables to jump directly to the memory bucket for the key in O(1) time.",
+          "analogy": "Opening a dictionary directly to letter \"S\" instead of reading every word from page 1.",
+          "memory": "Key string gets hashed via GetHashCode() mapping to bucket array index."
+        }
+      },
+      {
+        "id": "u5-n3",
+        "title": "HashSet<T> for Fast Tag Queries",
+        "topic": "Collections",
+        "q": {
+          "char": "lily",
+          "speech": "Check if the player has unlocked Quest 42 without duplicates!",
+          "type": "multiple_choice",
+          "title": "HashSet Uniqueness & Lookup",
+          "instruction": "What happens if you Add(42) twice to a HashSet<int>?",
+          "code": "HashSet<int> completedQuests = new HashSet<int>();\ncompletedQuests.Add(42);\nbool addedAgain = completedQuests.Add(42);\nConsole.WriteLine(completedQuests.Count);",
+          "choices": [
+            "1 (HashSets guarantee unique elements and ignore duplicate adds)",
+            "2",
+            "0",
+            "Throws DuplicateKeyException"
+          ],
+          "answer": 0,
+          "summary": "HashSets store unique elements; adding an existing item returns false and does nothing.",
+          "analogy": "A trophy case: you can only display one gold medal for each unique achievement.",
+          "memory": "Bucket collision resolves to existing entry; no reallocation occurs."
+        }
+      },
+      {
+        "id": "u5-n4",
+        "title": "Queue<T> for Action Buffering",
+        "topic": "Collections",
+        "q": {
+          "char": "junior",
+          "speech": "Buffer player attack inputs in a fighting game!",
+          "type": "multiple_choice",
+          "title": "FIFO Queue Processing",
+          "instruction": "In what order are actions dequeued from a Queue<T>?",
+          "code": "Queue<string> attacks = new Queue<string>();\nattacks.Enqueue(\"LightPunch\");\nattacks.Enqueue(\"HeavyKick\");\nConsole.WriteLine(attacks.Dequeue());",
+          "choices": [
+            "LightPunch (FIFO: First-In, First-Out)",
+            "HeavyKick (LIFO)",
+            "Random",
+            "Both at once"
+          ],
+          "answer": 0,
+          "summary": "Queues process items in First-In First-Out order (FIFO).",
+          "analogy": "Standing in line at the theater box office: the first person in line gets tickets first.",
+          "memory": "Circular ring buffer with head and tail pointers."
+        }
+      },
+      {
+        "id": "u5-n5",
+        "title": "Stack<T> for UI Menus & Undo",
+        "topic": "Collections",
+        "q": {
+          "char": "lily",
+          "speech": "Pressing the ESC button should close the top-most menu modal!",
+          "type": "multiple_choice",
+          "title": "LIFO Stack Navigation",
+          "instruction": "In what order are elements popped from a Stack<T>?",
+          "code": "Stack<string> menuStack = new Stack<string>();\nmenuStack.Push(\"PauseMenu\");\nmenuStack.Push(\"SettingsMenu\");\nConsole.WriteLine(menuStack.Pop());",
+          "choices": [
+            "SettingsMenu (LIFO: Last-In, First-Out)",
+            "PauseMenu",
+            "MainMenu",
+            "Error: Stack empty"
+          ],
+          "answer": 0,
+          "summary": "Stacks follow Last-In First-Out (LIFO). The most recently pushed menu is popped first.",
+          "analogy": "A stack of dinner plates: you always grab the plate on top.",
+          "memory": "Pointer to top element decrements on pop; zero heap allocations when within capacity."
+        }
+      },
+      {
+        "id": "u5-n6",
+        "title": "2D Grids & Coordinate Mapping",
+        "topic": "Collections",
+        "q": {
+          "char": "vikram",
+          "speech": "Map grid tile [x, y] coordinates to world positions!",
+          "type": "multiple_choice",
+          "title": "Tilemap Grid Formula",
+          "instruction": "If each grid cell is 2.0 units wide, what is the world position for cell [3, 4]?",
+          "code": "int x = 3, y = 4;\nfloat tileSize = 2f;\nVector3 worldPos = new Vector3(x * tileSize, 0, y * tileSize);",
+          "choices": [
+            "(6, 0, 8)",
+            "(3, 0, 4)",
+            "(1.5, 0, 2)",
+            "(8, 0, 6)"
+          ],
+          "answer": 0,
+          "summary": "3 * 2 = 6 and 4 * 2 = 8, yielding Vector3(6, 0, 8).",
+          "analogy": "Chess board coordinates: each square is spaced by an exact tile dimension.",
+          "memory": "Continuous flat memory array stride: index = x + y * gridWidth."
+        }
+      },
+      {
+        "id": "u5-n7",
+        "title": "LINQ in Gamedev: GC Allocations",
+        "topic": "Collections",
+        "q": {
+          "char": "duo",
+          "speech": "Why should you NOT use 'enemies.Where(e => e.hp > 0).ToList()' inside Update()?",
+          "type": "multiple_choice",
+          "title": "LINQ Garbage Collector Hitching",
+          "instruction": "What is the danger of running LINQ expressions every frame?",
+          "code": "// RUNNING IN UPDATE() EVERY FRAME:\nvar alive = enemies.Where(e => e.hp > 0).ToList();",
+          "choices": [
+            "Allocates temporary objects on the Heap, triggering GC spikes and frame drops",
+            "Causes compile errors on iOS",
+            "LINQ makes game characters run backwards",
+            "Enemies cannot have health"
+          ],
+          "answer": 0,
+          "summary": "LINQ statements allocate iterators, delegate closures, and new List instances on the heap every frame.",
+          "analogy": "Tossing plastic wrappers on the floor 60 times a second until the cleaning crew halts everything to sweep.",
+          "memory": "Heap churn pushes GC into Gen0 collection pause during gameplay."
+        }
+      },
+      {
+        "id": "u5-n8",
+        "title": "Enums & [Flags] Bitmasks",
+        "topic": "Collections",
+        "q": {
+          "char": "junior",
+          "speech": "A character can be BOTH Poisoned AND Frozen at the same time!",
+          "type": "multiple_choice",
+          "title": "Bitmask Enum Flags",
+          "instruction": "Which attribute and operator combines multiple enum values into one variable?",
+          "code": "[Flags]\npublic enum Status { None = 0, Poisoned = 1, Frozen = 2, Stunned = 4 }\nStatus current = Status.Poisoned | Status.Frozen;",
+          "choices": [
+            "[Flags] attribute with bitwise OR (|)",
+            "[Serialize] with plus (+)",
+            "[Bitmask] with AND (&)",
+            "[Multi] with comma (,)"
+          ],
+          "answer": 0,
+          "summary": "[Flags] enables bitwise combination (|) and checking ((current & Status.Poisoned) != 0).",
+          "analogy": "Stacking debuff icons over a hero head in an RPG.",
+          "memory": "Stored as binary bits in a single byte: 0001 | 0010 = 0011 (value 3)."
+        }
+      },
+      {
+        "id": "u5-n9",
+        "title": "Generics in Unity: GetComponent<T>()",
+        "topic": "Collections",
+        "q": {
+          "char": "lily",
+          "speech": "Why is GetComponent<Rigidbody>() safer than older GetComponent(string name)?",
+          "type": "multiple_choice",
+          "title": "Compile-Time Type Safety",
+          "instruction": "What major advantage do C# Generics (<T>) provide?",
+          "code": "Rigidbody rb = GetComponent<Rigidbody>();",
+          "choices": [
+            "Compile-time type checking and no string typo bugs or explicit casting",
+            "It runs on the GPU",
+            "It creates a new GameObject",
+            "It does not need semicolons"
+          ],
+          "answer": 0,
+          "summary": "Generics provide strong compile-time type safety, avoiding runtime string searches and cast exceptions.",
+          "analogy": "A custom tool slot that only accepts a 10mm wrench instead of guessing tool names.",
+          "memory": "C# JIT compiler generates specialized native method call for the specific type token."
+        }
+      },
+      {
+        "id": "u5-n10",
+        "title": "Unit 5 Milestone Trial: Inventory Master",
+        "topic": "Collections",
+        "q": {
+          "char": "vikram",
+          "speech": "DATA STRUCTURES BOSS! Choose the right collection for an enemy lookup by unique ID!",
+          "type": "multiple_choice",
+          "title": "Optimal Collection Choice",
+          "instruction": "Which data structure finds an enemy by unique integer ID in O(1) time with no duplicates?",
+          "code": "// Choose collection for: GetEnemyById(int id)",
+          "choices": [
+            "Dictionary<int, Enemy>",
+            "List<Enemy>",
+            "Queue<Enemy>",
+            "Stack<Enemy>"
+          ],
+          "answer": 0,
+          "summary": "Dictionary<int, Enemy> maps IDs directly to Enemy instances in O(1) constant time.",
+          "analogy": "Looking up a hotel guest room number directly from their room card key.",
+          "memory": "Internal bucket array indexed by hash mod size."
+        }
+      }
+    ]
+  },
+  {
+    "unit": 6,
+    "title": "Events, Delegates & Decoupled Architecture",
+    "badge": "UNIT 6 · DECOUPLED ARCHITECTURE & EVENTS",
+    "desc": "Delegates, Actions, Funcs, Events, Observer Pattern, and Global Event Buses.",
+    "colorClass": "u6",
+    "guidebook": {
+      "summary": "Decouple game systems so player scripts do not need references to UI, Audio, or Camera managers.",
+      "tips": [
+        "Use Action for callbacks that return void (e.g. Action<int> onTakeDamage).",
+        "Use Func for callbacks that return a value (e.g. Func<int, float> getMultiplier).",
+        "Always unsubscribe in OnDisable (-=) to prevent ghost listener memory leaks.",
+        "The Observer Pattern lets UI and Audio listen to gameplay without player scripts knowing they exist."
+      ]
+    },
+    "lessons": [
+      {
+        "id": "u6-n1",
+        "title": "Delegates: Function Pointers in C#",
+        "topic": "Events",
+        "q": {
+          "char": "junior",
+          "speech": "What is a delegate in C#?",
+          "type": "multiple_choice",
+          "title": "Delegate Definition",
+          "instruction": "What does a delegate variable actually store?",
+          "code": "public delegate void AttackCallback(int damage);\nAttackCallback onAttack = Punch;",
+          "choices": [
+            "A type-safe reference to a method (function pointer)",
+            "An audio sound file",
+            "A 3D mesh model",
+            "A string of code text"
+          ],
+          "answer": 0,
+          "summary": "A delegate is a type-safe object that holds references to one or more methods with matching signatures.",
+          "analogy": "A walkie-talkie channel where someone broadcasts an alert to listening listeners.",
+          "memory": "MulticastDelegate object on heap with _target (object) and _methodPtr (pointer)."
+        }
+      },
+      {
+        "id": "u6-n2",
+        "title": "System.Action & Action<T>",
+        "topic": "Events",
+        "q": {
+          "char": "lily",
+          "speech": "Stop writing custom delegate definitions! Use System.Action!",
+          "type": "multiple_choice",
+          "title": "System.Action Signature",
+          "instruction": "What return type does System.Action always have?",
+          "code": "public System.Action<int> OnCoinsChanged;",
+          "choices": [
+            "void (it does not return a value)",
+            "int",
+            "bool",
+            "string"
+          ],
+          "answer": 0,
+          "summary": "System.Action delegates represent methods that return void. Action<int> takes one int parameter.",
+          "analogy": "A megaphone announcement that announces news without expecting an answer back.",
+          "memory": "Standard library delegate definition: public delegate void Action<T>(T obj)."
+        }
+      },
+      {
+        "id": "u6-n3",
+        "title": "System.Func<T, TResult>",
+        "topic": "Events",
+        "q": {
+          "char": "vikram",
+          "speech": "What is the difference between Action and Func in C#?",
+          "type": "multiple_choice",
+          "title": "Func Return Value",
+          "instruction": "Which parameter represents the return type in Func<int, int, bool>?",
+          "code": "System.Func<int, int, bool> isCriticalHit;\n// (atk, defense) => bool",
+          "choices": [
+            "bool (the LAST type argument is always the return type)",
+            "int (the first type)",
+            "void",
+            "None"
+          ],
+          "answer": 0,
+          "summary": "In System.Func, the final generic type parameter is always the return type.",
+          "analogy": "Asking an appraiser how much a gem is worth: they inspect it and return the value.",
+          "memory": "Compiler expands to: public delegate TResult Func<in T1, in T2, out TResult>."
+        }
+      },
+      {
+        "id": "u6-n4",
+        "title": "C# Events & Encapsulation",
+        "topic": "Events",
+        "q": {
+          "char": "duo",
+          "speech": "Why add the 'event' keyword before an Action?",
+          "type": "multiple_choice",
+          "title": "Event Protection Keyword",
+          "instruction": "What illegal operation does the \"event\" keyword prevent other scripts from doing?",
+          "code": "public static event Action OnPlayerDied;",
+          "choices": [
+            "Prevents outside classes from invoking or clearing (= null) the event",
+            "Prevents adding new listeners",
+            "Stops the game from running",
+            "Prevents debugging"
+          ],
+          "answer": 0,
+          "summary": "The event keyword restricts outside classes to only subscribing (+=) and unsubscribing (-=).",
+          "analogy": "Only the radio station host can broadcast; listeners can only tune in, not hijack the mic.",
+          "memory": "Compiler generates private backing field and public add/remove accessor methods."
+        }
+      },
+      {
+        "id": "u6-n5",
+        "title": "Event Leaks: Unsubscribing in OnDisable",
+        "topic": "Events",
+        "q": {
+          "char": "junior",
+          "speech": "The player died, the level reloaded, but old UI scripts kept triggering! Why?",
+          "type": "multiple_choice",
+          "title": "Unsubscribe with -=",
+          "instruction": "Which operator removes your method from an event listener list?",
+          "code": "void OnDisable() {\n    PlayerHealth.OnDamaged -= HandleDamage;\n}",
+          "choices": [
+            "-=",
+            "+=",
+            "!=",
+            "--"
+          ],
+          "answer": 0,
+          "summary": "The -= operator removes the delegate handler, allowing the object to be cleanly garbage collected.",
+          "analogy": "Cancelling your magazine subscription when you move houses so mail stops arriving.",
+          "memory": "Delegate.Remove creates a new invocation list without the target reference."
+        }
+      },
+      {
+        "id": "u6-n6",
+        "title": "UnityEvent vs C# Action",
+        "topic": "Events",
+        "q": {
+          "char": "lily",
+          "speech": "When should you use UnityEvent instead of C# Action?",
+          "type": "multiple_choice",
+          "title": "UnityEvent Inspector Hookup",
+          "instruction": "What is the main benefit of UnityEvent over pure C# Action?",
+          "code": "[SerializeField] public UnityEngine.Events.UnityEvent onChestOpened;",
+          "choices": [
+            "It can be wired up visually in the Unity Inspector by level designers",
+            "It runs 100x faster than C# Actions",
+            "It works without any C# scripts",
+            "It saves memory on mobile"
+          ],
+          "answer": 0,
+          "summary": "UnityEvent allows designers to drag and drop GameObjects and hook up method calls in the Editor.",
+          "analogy": "Plugging an audio cable into an amplifier in the physical studio without soldering wires.",
+          "memory": "Uses reflection and serialized persistent call list; slightly more overhead than C# Action."
+        }
+      },
+      {
+        "id": "u6-n7",
+        "title": "Observer Pattern: HUD Decoupling",
+        "topic": "Events",
+        "q": {
+          "char": "vikram",
+          "speech": "Should the PlayerHealth script have a 'public HealthBarUI ui' reference?",
+          "type": "multiple_choice",
+          "title": "Decoupled Observer Pattern",
+          "instruction": "Why is it cleaner for HealthBarUI to observe PlayerHealth than PlayerHealth owning HealthBarUI?",
+          "code": "// PlayerHealth has NO references to UI:\nOnHealthChanged?.Invoke(currentHealth);",
+          "choices": [
+            "PlayerHealth can run in test scenes with NO UI present without throwing null errors",
+            "It makes health 2x bigger",
+            "It disables player damage",
+            "It uses less disk space"
+          ],
+          "answer": 0,
+          "summary": "Decoupling ensures the gameplay logic functions independently of whether a UI or audio listener exists.",
+          "analogy": "A rock band plays music whether 10 people or 10,000 people are listening in the crowd.",
+          "memory": "Zero coupling: PlayerHealth holds no pointer to HealthBarUI object."
+        }
+      },
+      {
+        "id": "u6-n8",
+        "title": "Audio Event Dispatcher",
+        "topic": "Events",
+        "q": {
+          "char": "junior",
+          "speech": "Play a jump sound effect without referencing AudioManager in PlayerController!",
+          "type": "multiple_choice",
+          "title": "Audio Event Trigger",
+          "instruction": "How can the sound play cleanly through an event?",
+          "code": "public static event Action OnPlayerJumped;\n// In Player:\nOnPlayerJumped?.Invoke();\n// In AudioManager:\nvoid OnEnable() { OnPlayerJumped += PlayJumpSfx; }",
+          "choices": [
+            "Player triggers event; AudioManager listens and plays sound",
+            "Player must call AudioManager.Instance.PlayJump()",
+            "Player plays sound on CPU directly",
+            "Unity handles it automatically with no code"
+          ],
+          "answer": 0,
+          "summary": "The player script emits the event; the audio system listens and responds without direct coupling.",
+          "analogy": "Pulling the fire alarm: the alarm system handles sirens without the person shouting.",
+          "memory": "Static event dispatches to all registered listeners in invoke queue."
+        }
+      },
+      {
+        "id": "u6-n9",
+        "title": "Global Event Bus Architecture",
+        "topic": "Events",
+        "q": {
+          "char": "duo",
+          "speech": "What is a Global Event Bus in game architecture?",
+          "type": "multiple_choice",
+          "title": "Event Bus Pattern",
+          "instruction": "What role does an EventBus class play in large game projects?",
+          "code": "EventBus.Publish(new EnemyDefeatedEvent(enemyId, xpAwarded));",
+          "choices": [
+            "A centralized messaging hub that dispatches events across disconnected systems",
+            "A bus vehicle model in Unity physics",
+            "An audio mixer bus only",
+            "A local variable inside Update"
+          ],
+          "answer": 0,
+          "summary": "An Event Bus acts as a central hub where publishers post events and subscribers listen by event type.",
+          "analogy": "The post office: anyone can drop off mail, and the post office delivers it to whoever subscribed.",
+          "memory": "Type-keyed dictionary mapping EventType -> Action<TEvent>."
+        }
+      },
+      {
+        "id": "u6-n10",
+        "title": "Unit 6 Milestone Trial: Event Bus Gauntlet",
+        "topic": "Events",
+        "q": {
+          "char": "duo",
+          "speech": "EVENTS MILESTONE BOSS! What does '?.' (null-conditional) do before .Invoke()?",
+          "type": "multiple_choice",
+          "title": "Null-Conditional Event Invocation",
+          "instruction": "Why do we write OnScoreChanged?.Invoke(score)?",
+          "code": "OnScoreChanged?.Invoke(score);",
+          "choices": [
+            "It checks if OnScoreChanged has any subscribers before invoking, preventing NullReferenceException",
+            "It delays the call by 1 frame",
+            "It repeats the call 10 times",
+            "It converts score to a float"
+          ],
+          "answer": 0,
+          "summary": "If no scripts subscribed to the event, OnScoreChanged is null. The ?. operator safely prevents a crash.",
+          "analogy": "Checking if anyone is on the other end of the telephone before speaking.",
+          "memory": "Thread-safe copy and null check before CALLVIRT instruction."
+        }
+      }
+    ]
+  },
+  {
+    "unit": 7,
+    "title": "Coroutines, Timers & Asynchronous Systems",
+    "badge": "UNIT 7 · TIMERS & ASYNCHRONOUS SYSTEMS",
+    "desc": "IEnumerator, yield return, WaitForSeconds, UniTask, and Async/Await in game loops.",
+    "colorClass": "u7",
+    "guidebook": {
+      "summary": "Execute logic across multiple frames without freezing the game UI using Coroutines and Tasks.",
+      "tips": [
+        "Coroutines execute up to a \"yield return\", then pause until the engine resumes them next frame.",
+        "Use WaitForSecondsRealtime() if a timer needs to run while the game is paused (Time.timeScale = 0).",
+        "Store your Coroutine reference so you can call StopCoroutine() safely when interrupted.",
+        "UniTask provides zero-allocation async/await tailored for Unity performance."
+      ]
+    },
+    "lessons": [
+      {
+        "id": "u7-n1",
+        "title": "Coroutines 101: IEnumerator & StartCoroutine",
+        "topic": "Coroutines",
+        "q": {
+          "char": "junior",
+          "speech": "Why can't we use Thread.Sleep(3000) to wait 3 seconds in a game?",
+          "type": "multiple_choice",
+          "title": "Main Thread Freezing",
+          "instruction": "What catastrophe happens if you call Thread.Sleep() on Unity main thread?",
+          "code": "// WRONG: Thread.Sleep(3000);\n// RIGHT: StartCoroutine(WaitRoutine());",
+          "choices": [
+            "The entire game freezes completely, dropping to 0 FPS for 3 seconds",
+            "The computer reboots",
+            "Nothing, it runs smoothly",
+            "The character speeds up"
+          ],
+          "answer": 0,
+          "summary": "Thread.Sleep halts the main thread that renders graphics, freezing the entire window.",
+          "analogy": "Freezing time in the universe instead of just waiting for an egg timer to ding.",
+          "memory": "Blocks OS main message loop and DirectX swapchain present call."
+        }
+      },
+      {
+        "id": "u7-n2",
+        "title": "yield return null vs WaitForSeconds",
+        "topic": "Coroutines",
+        "q": {
+          "char": "lily",
+          "speech": "How do you pause a coroutine for exactly ONE frame?",
+          "type": "multiple_choice",
+          "title": "Single Frame Yield",
+          "instruction": "Which yield statement waits for the very next frame to continue?",
+          "code": "IEnumerator FlashColor() {\n    sprite.color = Color.red;\n    yield return null;\n    sprite.color = Color.white;\n}",
+          "choices": [
+            "yield return null;",
+            "yield return 1;",
+            "yield break;",
+            "yield wait;"
+          ],
+          "answer": 0,
+          "summary": "yield return null pauses execution and resumes on the very next frame.",
+          "analogy": "Taking a breath between sword swings and continuing on the next frame tick.",
+          "memory": "Coroutine manager queues the IEnumerator for MoveNext() in next frame update pass."
+        }
+      },
+      {
+        "id": "u7-n3",
+        "title": "WaitForSecondsRealtime & Pause Menus",
+        "topic": "Coroutines",
+        "q": {
+          "char": "vikram",
+          "speech": "When the game is paused (Time.timeScale = 0), which yield instruction still works?",
+          "type": "multiple_choice",
+          "title": "Unscaled Realtime Timers",
+          "instruction": "Why does yield return new WaitForSeconds(1f) freeze indefinitely when timeScale is 0?",
+          "code": "// Pause Menu Animation:\nyield return new WaitForSecondsRealtime(1.5f);",
+          "choices": [
+            "WaitForSeconds relies on scaled time (timeScale = 0 means 0 seconds pass); WaitForSecondsRealtime uses system clock",
+            "WaitForSeconds is broken in Unity",
+            "WaitForSeconds uses GPU time",
+            "WaitForSeconds only works in 2D"
+          ],
+          "answer": 0,
+          "summary": "WaitForSeconds scales with Time.timeScale. When paused, use WaitForSecondsRealtime.",
+          "analogy": "Your wristwatch continues ticking even if you hit the pause button on your DVD player.",
+          "memory": "Reads unscaled real-time hardware clock (System.Diagnostics.Stopwatch)."
+        }
+      },
+      {
+        "id": "u7-n4",
+        "title": "Stopping Coroutines Safely",
+        "topic": "Coroutines",
+        "q": {
+          "char": "junior",
+          "speech": "The player died while drinking a potion! Cancel the potion coroutine immediately!",
+          "type": "multiple_choice",
+          "title": "Coroutine Handle Cancellation",
+          "instruction": "How do you store and cancel a specific running coroutine?",
+          "code": "private Coroutine healRoutine;\nhealRoutine = StartCoroutine(HealOverTime());\n// Cancel:\nif (healRoutine != null) StopCoroutine(healRoutine);",
+          "choices": [
+            "Store the Coroutine handle and pass it to StopCoroutine()",
+            "Call StopAllCoroutines() on everything",
+            "Set healRoutine = null",
+            "Delete the GameObject"
+          ],
+          "answer": 0,
+          "summary": "Passing the stored Coroutine handle stops only that specific routine without killing other scripts.",
+          "analogy": "Tearing up one specific ticket rather than evicting everyone from the stadium.",
+          "memory": "Unity engine removes specific coroutine node from active linked list."
+        }
+      },
+      {
+        "id": "u7-n5",
+        "title": "Screen Fade Transition Coroutine",
+        "topic": "Coroutines",
+        "q": {
+          "char": "lily",
+          "speech": "Smooth screen fade out to black over 2 seconds!",
+          "type": "multiple_choice",
+          "title": "Fade Loop Pattern",
+          "instruction": "What loop condition ensures the fade lasts exactly duration seconds?",
+          "code": "IEnumerator FadeOut(float duration) {\n    float t = 0f;\n    while (t < duration) {\n        t += Time.deltaTime;\n        canvasGroup.alpha = t / duration;\n        yield return null;\n    }\n}",
+          "choices": [
+            "while (t < duration) with t += Time.deltaTime and yield return null",
+            "while (true) with no yield",
+            "for (int i=0; i<100; i++) with Thread.Sleep",
+            "if (t < duration)"
+          ],
+          "answer": 0,
+          "summary": "Accumulating deltaTime each frame while t < duration produces a smooth time-based transition.",
+          "analogy": "Gradually sliding a fader up from 0% opacity to 100% opacity over 2 seconds.",
+          "memory": "Normalized parameter (t / duration) goes smoothly from 0.0 to 1.0."
+        }
+      },
+      {
+        "id": "u7-n6",
+        "title": "Async / Await in Modern Unity C#",
+        "topic": "Coroutines",
+        "q": {
+          "char": "vikram",
+          "speech": "Can we use standard C# 'async Task' methods in modern Unity?",
+          "type": "multiple_choice",
+          "title": "Task vs Coroutine Return",
+          "instruction": "What is a major advantage of async Tasks over Coroutines?",
+          "code": "public async Task<int> FetchPlayerLeaderboardRankAsync() {\n    await Task.Delay(1000);\n    return 42;\n}",
+          "choices": [
+            "Tasks can return values (e.g. Task<int>) directly, whereas Coroutines cannot",
+            "Tasks only work in offline games",
+            "Tasks cannot wait for time",
+            "Tasks disable all garbage collection"
+          ],
+          "answer": 0,
+          "summary": "Async methods can easily return typed values (Task<T>) and handle try/catch exceptions cleanly.",
+          "analogy": "Ordering food at a counter and receiving your meal tray when your number is called.",
+          "memory": "State machine struct generated by compiler with AsyncTaskMethodBuilder."
+        }
+      },
+      {
+        "id": "u7-n7",
+        "title": "Task.Delay vs UniTask",
+        "topic": "Coroutines",
+        "q": {
+          "char": "duo",
+          "speech": "Why do top mobile game studios use UniTask instead of System.Threading.Tasks?",
+          "type": "multiple_choice",
+          "title": "UniTask Zero-Allocation",
+          "instruction": "What is the primary performance benefit of UniTask in game loops?",
+          "code": "await UniTask.Delay(1000, ignoreTimeScale: false);",
+          "choices": [
+            "UniTask uses value-type structs that generate zero GC allocations on await",
+            "UniTask runs on the GPU rasterizer",
+            "UniTask does not require C#",
+            "UniTask makes textures sharper"
+          ],
+          "answer": 0,
+          "summary": "Standard Task generates heap allocations for every task object; UniTask is struct-based and zero-allocation.",
+          "analogy": "Renting a reusable metal tray instead of throwing away paper cups on every order.",
+          "memory": "Struct UniTask avoids GC Gen0 heap pressure."
+        }
+      },
+      {
+        "id": "u7-n8",
+        "title": "CancellationTokens for Scene Unloading",
+        "topic": "Coroutines",
+        "q": {
+          "char": "vikram",
+          "speech": "Prevent an async task from modifying a destroyed GameObject after level restart!",
+          "type": "multiple_choice",
+          "title": "CancellationToken Protection",
+          "instruction": "Which Unity helper token automatically cancels when the GameObject is destroyed?",
+          "code": "await UniTask.Delay(5000, cancellationToken: this.GetCancellationTokenOnDestroy());",
+          "choices": [
+            "this.GetCancellationTokenOnDestroy()",
+            "CancellationToken.None",
+            "new Token()",
+            "destroyToken.Force()"
+          ],
+          "answer": 0,
+          "summary": "Binding the task to the destruction token aborts execution if the scene reloads, preventing null errors.",
+          "analogy": "Cancelling your pizza order if you move away before it arrives.",
+          "memory": "OperationCanceledException safely caught and short-circuited."
+        }
+      },
+      {
+        "id": "u7-n9",
+        "title": "Async Scene Loading",
+        "topic": "Coroutines",
+        "q": {
+          "char": "junior",
+          "speech": "Display a 0% to 100% loading bar while loading the Next Dungeon Level!",
+          "type": "multiple_choice",
+          "title": "AsyncOperation Progress",
+          "instruction": "Which API loads a scene in the background without freezing gameplay?",
+          "code": "AsyncOperation op = SceneManager.LoadSceneAsync(\"DungeonLevel2\");\nwhile (!op.isDone) {\n    loadingBar.fillAmount = op.progress;\n    yield return null;\n}",
+          "choices": [
+            "SceneManager.LoadSceneAsync",
+            "SceneManager.LoadScene",
+            "SceneManager.InstantLoad",
+            "Application.OpenURL"
+          ],
+          "answer": 0,
+          "summary": "LoadSceneAsync loads assets in the background, reporting op.progress (0.0 to 0.9) until activation.",
+          "analogy": "A backstage crew building the next scene behind the curtains while actors finish talking.",
+          "memory": "Background asset streaming thread deserializes serialized files into memory."
+        }
+      },
+      {
+        "id": "u7-n10",
+        "title": "Unit 7 Milestone Trial: Time Bender Challenge",
+        "topic": "Coroutines",
+        "q": {
+          "char": "duo",
+          "speech": "ASYNC MILESTONE BOSS! What does 'yield break;' do inside a Coroutine?",
+          "type": "multiple_choice",
+          "title": "Yield Break Immediate Exit",
+          "instruction": "What is the effect of calling yield break;?",
+          "code": "if (playerIsDead) {\n    yield break;\n}",
+          "choices": [
+            "Immediately terminates the coroutine execution permanently",
+            "Pauses for 1 frame",
+            "Pauses for 1 second",
+            "Crashes the application"
+          ],
+          "answer": 0,
+          "summary": "yield break immediately halts the coroutine, signaling MoveNext() has no further iterations.",
+          "analogy": "Hanging up the phone call immediately because the party left.",
+          "memory": "MoveNext() returns false; engine removes routine from active runner pool."
+        }
+      }
+    ]
+  },
+  {
+    "unit": 8,
+    "title": "ScriptableObjects & Data-Driven Architecture",
+    "badge": "UNIT 8 · SCRIPTABLE OBJECTS & ARCHITECTURE",
+    "desc": "Asset menus, modular weapon stats, ScriptableObject events, and runtime sets.",
+    "colorClass": "u8",
+    "guidebook": {
+      "summary": "Store data in project assets rather than scene instances to share stats, reduce memory, and build modular systems.",
+      "tips": [
+        "[CreateAssetMenu] allows you to right-click in Project folder to create new data assets.",
+        "ScriptableObjects do not store transform or scene data, making them lightweight.",
+        "Use ScriptableObject Game Events to create ultra-decoupled architecture (Ryan Hipple pattern).",
+        "Runtime Sets automatically register active enemies on Awake and unregister on Destroy."
+      ]
+    },
+    "lessons": [
+      {
+        "id": "u8-n1",
+        "title": "ScriptableObject Basics & [CreateAssetMenu]",
+        "topic": "ScriptableObjects",
+        "q": {
+          "char": "lily",
+          "speech": "How do you allow designers to right-click in the Project window and create a new Item data file?",
+          "type": "multiple_choice",
+          "title": "CreateAssetMenu Attribute",
+          "instruction": "Which attribute exposes the asset creation option in the Unity menu?",
+          "code": "[CreateAssetMenu(fileName = \"NewItem\", menuName = \"RPG/Item\")]\npublic class ItemData : ScriptableObject {\n    public string itemName;\n    public int goldValue;\n}",
+          "choices": [
+            "[CreateAssetMenu]",
+            "[MenuItem]",
+            "[AddComponentMenu]",
+            "[AssetData]"
+          ],
+          "answer": 0,
+          "summary": "[CreateAssetMenu] adds your custom ScriptableObject to the Assets -> Create context menu.",
+          "analogy": "Creating a new template card in your trading card binder.",
+          "memory": "Creates a .asset YAML file in the project directory."
+        }
+      },
+      {
+        "id": "u8-n2",
+        "title": "Weapon & Enemy Data Cards",
+        "topic": "ScriptableObjects",
+        "q": {
+          "char": "junior",
+          "speech": "Why should 100 goblin prefabs all reference ONE GoblinStats ScriptableObject?",
+          "type": "multiple_choice",
+          "title": "Memory Flyweight Sharing",
+          "instruction": "What is the architectural advantage of referencing a shared ScriptableObject for stats?",
+          "code": "public class Enemy : MonoBehaviour {\n    [SerializeField] private EnemyData stats;\n}",
+          "choices": [
+            "All 100 goblins share the exact same stats memory, and tweaking the asset updates all goblins live",
+            "Goblins become invincible",
+            "Goblins walk twice as fast",
+            "Saves GPU shader passes"
+          ],
+          "answer": 0,
+          "summary": "Sharing a ScriptableObject avoids duplicating stats data across hundreds of instances and allows live balance tuning.",
+          "analogy": "All soldiers in an army reading from the same field manual instead of printing 10,000 separate rulebooks.",
+          "memory": "Single heap instance loaded in memory; instances store only a pointer to it."
+        }
+      },
+      {
+        "id": "u8-n3",
+        "title": "ScriptableObject Game Events",
+        "topic": "ScriptableObjects",
+        "q": {
+          "char": "vikram",
+          "speech": "The famous Ryan Hipple Unite talk: Game Events as Assets!",
+          "type": "multiple_choice",
+          "title": "ScriptableObject Event Channel",
+          "instruction": "Where does a ScriptableObject GameEvent live in your Unity project?",
+          "code": "public class GameEvent : ScriptableObject {\n    private List<GameEventListener> listeners = new List<GameEventListener>();\n    public void Raise() { for(int i=listeners.Count-1; i>=0; i--) listeners[i].OnEventRaised(); }\n}",
+          "choices": [
+            "In the Project folder as an independent .asset file",
+            "Inside scene Hierarchy attached to Camera",
+            "In user AppData folder",
+            "On the graphics card"
+          ],
+          "answer": 0,
+          "summary": "Event assets exist in the Project folder, allowing scenes to communicate without direct references.",
+          "analogy": "A shared public bulletin board where anyone can pin a notice and anyone can read it.",
+          "memory": "Project asset persists across scene unloads without DontDestroyOnLoad."
+        }
+      },
+      {
+        "id": "u8-n4",
+        "title": "Runtime Sets with ScriptableObjects",
+        "topic": "ScriptableObjects",
+        "q": {
+          "char": "junior",
+          "speech": "Find all active enemies without calling GameObject.FindGameObjectsWithTag('Enemy')!",
+          "type": "multiple_choice",
+          "title": "Runtime Set Auto-Registration",
+          "instruction": "How does an Enemy register itself into a ScriptableObject RuntimeSet?",
+          "code": "public class EnemyRuntimeSet : ScriptableObject {\n    public List<Enemy> items = new List<Enemy>();\n}\n// In Enemy script:\nvoid OnEnable() { allEnemiesSet.Add(this); }\nvoid OnDisable() { allEnemiesSet.Remove(this); }",
+          "choices": [
+            "Enemies add themselves in OnEnable and remove in OnDisable",
+            "Call FindObjectsOfType every frame",
+            "Hardcode all enemy coordinates",
+            "Use Unity Profiler"
+          ],
+          "answer": 0,
+          "summary": "Self-registering runtime sets give you an instant list of active enemies with zero search overhead.",
+          "analogy": "Checking in at the gym reception desk when you arrive, and checking out when you leave.",
+          "memory": "O(1) list insertion; no expensive scene hierarchy scans."
+        }
+      },
+      {
+        "id": "u8-n5",
+        "title": "Audio Event ScriptableObjects",
+        "topic": "ScriptableObjects",
+        "q": {
+          "char": "lily",
+          "speech": "Randomize footsteps audio with slight pitch variance!",
+          "type": "multiple_choice",
+          "title": "Audio SO Configuration",
+          "instruction": "How does an AudioEvent asset prevent repetitive machine-gun audio clicks?",
+          "code": "public class AudioEvent : ScriptableObject {\n    public AudioClip[] clips;\n    public Vector2 pitchRange = new Vector2(0.9f, 1.1f);\n    public void Play(AudioSource source) {\n        source.pitch = Random.Range(pitchRange.x, pitchRange.y);\n        source.PlayOneShot(clips[Random.Range(0, clips.Length)]);\n    }\n}",
+          "choices": [
+            "It picks random audio clips and randomizes pitch in a narrow range",
+            "It doubles volume each time",
+            "It mutes sound",
+            "It slows down frame rate"
+          ],
+          "answer": 0,
+          "summary": "Randomizing clip selection and pitch creates natural, organic sound effects.",
+          "analogy": "Every footstep crunching in the snow sounds subtly different.",
+          "memory": "Lightweight configuration struct applied to audio hardware voice."
+        }
+      },
+      {
+        "id": "u8-n6",
+        "title": "Dialogue Trees with ScriptableObjects",
+        "topic": "ScriptableObjects",
+        "q": {
+          "char": "lily",
+          "speech": "Design branching NPC dialogue without messy nested switch statements!",
+          "type": "multiple_choice",
+          "title": "Dialogue Node Data Asset",
+          "instruction": "How do dialogue nodes link to follow-up responses in ScriptableObjects?",
+          "code": "[System.Serializable]\npublic class DialogueChoice {\n    public string optionText;\n    public DialogueNode nextNode;\n}",
+          "choices": [
+            "Each choice holds a reference to the next DialogueNode ScriptableObject",
+            "By searching line numbers in text",
+            "By hardcoding player coordinates",
+            "Using Rigidbody collisions"
+          ],
+          "answer": 0,
+          "summary": "Node assets reference child nodes, forming an editable branching graph in the editor.",
+          "analogy": "A \"Choose Your Own Adventure\" book: \"If you open the chest, turn to Node 12\".",
+          "memory": "Graph data structure serialized into YAML asset files."
+        }
+      },
+      {
+        "id": "u8-n7",
+        "title": "Buff & Status Effect Modifiers",
+        "topic": "ScriptableObjects",
+        "q": {
+          "char": "junior",
+          "speech": "Equip a 'Fire Enchantment' buff to our sword!",
+          "type": "multiple_choice",
+          "title": "Modular Buff Asset",
+          "instruction": "Why is defining buffs as ScriptableObjects better than writing 50 if-statements in Weapon?",
+          "code": "public abstract class WeaponBuff : ScriptableObject {\n    public abstract void OnHit(Enemy enemy, ref int damage);\n}",
+          "choices": [
+            "You can create new buffs by just making new assets without modifying the core Weapon code",
+            "Buffs run faster on CPU",
+            "Buffs automatically double your money",
+            "It avoids saving games"
+          ],
+          "answer": 0,
+          "summary": "Open-Closed Principle: Open for extension (new buff assets), closed for modification (Weapon script unchanged).",
+          "analogy": "Slotting different elemental gems into the hilt of your sword.",
+          "memory": "Polymorphic dispatch over buff asset array."
+        }
+      },
+      {
+        "id": "u8-n8",
+        "title": "Shared AI Behavior Configs",
+        "topic": "ScriptableObjects",
+        "q": {
+          "char": "vikram",
+          "speech": "Tweak zombie patrol speed across 20 scenes at once!",
+          "type": "multiple_choice",
+          "title": "Global Balance Tuning",
+          "instruction": "If you change patrolSpeed in ZombieConfig.asset, which zombies receive the update?",
+          "code": "[SerializeField] private AIConfig zombieConfig;",
+          "choices": [
+            "Every zombie referencing that config across all scenes and prefabs",
+            "Only the first zombie in the hierarchy",
+            "None until you recompile C#",
+            "Only zombies in the active camera view"
+          ],
+          "answer": 0,
+          "summary": "Because the asset is shared, editing it updates every prefab and instance that points to it.",
+          "analogy": "Updating the rulebook in the head office instantly updates every branch store.",
+          "memory": "Single source of truth in project memory cache."
+        }
+      },
+      {
+        "id": "u8-n9",
+        "title": "Saving Game State to JSON",
+        "topic": "ScriptableObjects",
+        "q": {
+          "char": "junior",
+          "speech": "Save the player's inventory to disk so they can quit and resume tomorrow!",
+          "type": "multiple_choice",
+          "title": "JsonUtility Serialization",
+          "instruction": "Which Unity utility serializes a C# data object into a JSON string?",
+          "code": "string json = JsonUtility.ToJson(saveData, prettyPrint: true);\nFile.WriteAllText(savePath, json);",
+          "choices": [
+            "JsonUtility.ToJson()",
+            "JsonUtility.Parse()",
+            "File.Convert()",
+            "String.Save()"
+          ],
+          "answer": 0,
+          "summary": "JsonUtility.ToJson converts supported C# data structures into clean human-readable JSON strings.",
+          "analogy": "Writing down your character stats onto a parchment save-file before closing the game.",
+          "memory": "Fast native C++ serializer traverses marked [Serializable] fields."
+        }
+      },
+      {
+        "id": "u8-n10",
+        "title": "Unit 8 Milestone Trial: Scriptable Architect",
+        "topic": "ScriptableObjects",
+        "q": {
+          "char": "duo",
+          "speech": "DATA ARCHITECTURE BOSS! What happens to modified ScriptableObject variables during Play Mode in the Unity Editor?",
+          "type": "multiple_choice",
+          "title": "Editor ScriptableObject State Persistence Trap",
+          "instruction": "In the Unity Editor, if a script modifies a ScriptableObject variable during Play Mode, what happens when you exit Play Mode?",
+          "code": "// Tweak during Play Mode:\nstatsAsset.health -= 10;",
+          "choices": [
+            "The changes persist in the Editor asset on disk (unlike MonoBehaviours which reset)!",
+            "The computer shuts down",
+            "Visual Studio deletes the class",
+            "The scene crashes"
+          ],
+          "answer": 0,
+          "summary": "In the Unity Editor, ScriptableObject modifications persist across play sessions! Always reset runtime state or use non-destructive copies.",
+          "analogy": "Drawing in permanent marker on your master blueprint instead of using a dry-erase marker.",
+          "memory": "Editor asset file dirty flag marks changes into project memory representation."
+        }
+      }
+    ]
+  },
+  {
+    "unit": 9,
+    "title": "Scalable Game Design Patterns",
+    "badge": "UNIT 9 · SCALABLE GAME DESIGN PATTERNS",
+    "desc": "Singletons, State Machines, Object Pools, Command Pattern, and Factory Pattern.",
+    "colorClass": "u9",
+    "guidebook": {
+      "summary": "Professional architecture patterns used by AAA and top indie teams to build scalable, bug-free game engines.",
+      "tips": [
+        "Object Pooling reuses destroyed projectiles and particles to eliminate GC allocation hitches.",
+        "Finite State Machines (FSM) keep enemy AI states (Idle, Chase, Attack) clean and organized.",
+        "Singletons should be used sparingly for core managers (Audio, Save, GameController).",
+        "Command Pattern encapsulates player actions for easy input rebinding and replay systems."
+      ]
+    },
+    "lessons": [
+      {
+        "id": "u9-n1",
+        "title": "Singleton Pattern: Safe Lazy Initialization",
+        "topic": "Patterns",
+        "q": {
+          "char": "junior",
+          "speech": "Access GameManager.Instance from anywhere in the game!",
+          "type": "multiple_choice",
+          "title": "Singleton Pattern Implementation",
+          "instruction": "What pattern ensures only ONE instance of a class exists globally?",
+          "code": "public class GameManager : MonoBehaviour {\n    public static GameManager Instance { get; private set; }\n    void Awake() {\n        if (Instance != null && Instance != this) Destroy(gameObject);\n        else Instance = this;\n    }\n}",
+          "choices": [
+            "Singleton Pattern",
+            "Factory Pattern",
+            "Observer Pattern",
+            "Decorator Pattern"
+          ],
+          "answer": 0,
+          "summary": "The Singleton pattern provides a global access point to a single instance while destroying duplicate spawns.",
+          "analogy": "There can be only one President of the country at any given time.",
+          "memory": "Static reference in type table pointing to the solitary active instance on the heap."
+        }
+      },
+      {
+        "id": "u9-n2",
+        "title": "Persistent Generic Singleton",
+        "topic": "Patterns",
+        "q": {
+          "char": "vikram",
+          "speech": "Keep the AudioManager alive when loading from Main Menu into Level 1!",
+          "type": "multiple_choice",
+          "title": "DontDestroyOnLoad Persistence",
+          "instruction": "Which Unity API keeps a GameObject alive across scene transitions?",
+          "code": "DontDestroyOnLoad(gameObject);",
+          "choices": [
+            "DontDestroyOnLoad",
+            "SceneManager.KeepAlive",
+            "GameObject.Persist",
+            "Application.Stay"
+          ],
+          "answer": 0,
+          "summary": "DontDestroyOnLoad moves the GameObject into a special DontDestroyOnLoad scene that never unloads.",
+          "analogy": "A backpack you carry through every room in a castle without leaving it behind.",
+          "memory": "Native engine moves transform root to the persistent scene manager list."
+        }
+      },
+      {
+        "id": "u9-n3",
+        "title": "State Pattern: Finite State Machine",
+        "topic": "Patterns",
+        "q": {
+          "char": "lily",
+          "speech": "Clean enemy AI without 50 nested if-else statements!",
+          "type": "multiple_choice",
+          "title": "FSM Interface",
+          "instruction": "What interface methods define a classic state in a Finite State Machine?",
+          "code": "public interface IState {\n    void Enter();\n    void Update();\n    void Exit();\n}",
+          "choices": [
+            "Enter(), Update(), Exit()",
+            "Start(), Stop(), Die()",
+            "Run(), Jump(), Fall()",
+            "Open(), Close(), Read()"
+          ],
+          "answer": 0,
+          "summary": "Enter handles state setup, Update handles frame logic, and Exit handles state cleanup before transitioning.",
+          "analogy": "Traffic lights: Green (Enter), Green timer (Update), Turn off Green (Exit) -> Yellow (Enter).",
+          "memory": "Polymorphic state reference currentState.Update() executes active state logic."
+        }
+      },
+      {
+        "id": "u9-n4",
+        "title": "Command Pattern: Input Rebinding & Replay",
+        "topic": "Patterns",
+        "q": {
+          "char": "junior",
+          "speech": "Enable player input rebinding and action replay/undo!",
+          "type": "multiple_choice",
+          "title": "Command Pattern Execution",
+          "instruction": "What does the Command Pattern encapsulate?",
+          "code": "public interface ICommand {\n    void Execute();\n    void Undo();\n}",
+          "choices": [
+            "An action or request as a standalone object with Execute() and Undo()",
+            "A console command string only",
+            "A compiler flag",
+            "A graphics texture"
+          ],
+          "answer": 0,
+          "summary": "The Command pattern encapsulates requests as objects, allowing action queuing, logging, and undo/redo.",
+          "analogy": "A restaurant order slip: the waiter hands the chef a ticket that can be prepared or refunded.",
+          "memory": "Command instances stored in history stack for execution and reversal."
+        }
+      },
+      {
+        "id": "u9-n5",
+        "title": "Object Pooling 101",
+        "topic": "Patterns",
+        "q": {
+          "char": "duo",
+          "speech": "Shooting 50 machine gun bullets per second without lagging the game!",
+          "type": "multiple_choice",
+          "title": "Object Pooling Concept",
+          "instruction": "Instead of calling Instantiate() and Destroy(), what does an Object Pool do?",
+          "code": "// WRONG: Destroy(bullet);\n// RIGHT: bullet.SetActive(false); pool.Return(bullet);",
+          "choices": [
+            "Deactivates bullets and reuses them from a pre-warmed queue",
+            "Deletes bullets faster",
+            "Lowers screen resolution",
+            "Shrinks bullet textures"
+          ],
+          "answer": 0,
+          "summary": "Object Pooling recycles inactive objects, completely eliminating Instantiate and Destroy GC overhead.",
+          "analogy": "Borrowing bowling shoes at the alley: you return them to the counter for the next customer.",
+          "memory": "Zero heap allocations at runtime; stable memory footprint prevents GC pauses."
+        }
+      },
+      {
+        "id": "u9-n6",
+        "title": "Generic Object Pool & IPoolable",
+        "topic": "Patterns",
+        "q": {
+          "char": "vikram",
+          "speech": "Reset bullet velocities when spawning from the pool!",
+          "type": "multiple_choice",
+          "title": "IPoolable Reset Interface",
+          "instruction": "What method should an IPoolable interface provide to reset state upon reuse?",
+          "code": "public interface IPoolable {\n    void OnSpawnFromPool();\n}",
+          "choices": [
+            "OnSpawnFromPool() (resets velocity, health, and timers)",
+            "OnDestroy()",
+            "Start()",
+            "Awake()"
+          ],
+          "answer": 0,
+          "summary": "Since Awake and Start only run once upon initial creation, pooled objects use OnSpawnFromPool to reset.",
+          "analogy": "Wiping down the chalkboard before drawing the next turn combat map.",
+          "memory": "Resets member variables to defaults without allocating new memory."
+        }
+      },
+      {
+        "id": "u9-n7",
+        "title": "Factory Pattern for Enemy Spawning",
+        "topic": "Patterns",
+        "q": {
+          "char": "lily",
+          "speech": "Spawn Boss, Flying, or Ground enemies dynamically based on dungeon level!",
+          "type": "multiple_choice",
+          "title": "Factory Pattern Abstraction",
+          "instruction": "What is the responsibility of an EnemyFactory class?",
+          "code": "public class EnemyFactory {\n    public Enemy CreateEnemy(EnemyType type) {\n        // Return configured instance\n    }\n}",
+          "choices": [
+            "Encapsulating enemy instantiation and configuration logic in one centralized class",
+            "Managing player saves",
+            "Handling physics collisions",
+            "Drawing textures"
+          ],
+          "answer": 0,
+          "summary": "The Factory pattern centralizes object creation logic, decoupling spawner scripts from enemy setup details.",
+          "analogy": "An automaker assembly plant: you ask for a sports car, and the factory handles the assembly.",
+          "memory": "Centralized factory method routes creation parameters to correct prefab instance."
+        }
+      },
+      {
+        "id": "u9-n8",
+        "title": "Service Locator Pattern",
+        "topic": "Patterns",
+        "q": {
+          "char": "junior",
+          "speech": "Find the Audio service without creating 20 static singletons!",
+          "type": "multiple_choice",
+          "title": "Service Locator Registry",
+          "instruction": "How does a Service Locator provide services to game scripts?",
+          "code": "IAudioService audio = ServiceLocator.Get<IAudioService>();\naudio.PlaySound(\"Victory\");",
+          "choices": [
+            "Scripts request services by interface type from a central registry",
+            "By hardcoding file paths on Windows",
+            "By searching scene hierarchy",
+            "By reading JSON every frame"
+          ],
+          "answer": 0,
+          "summary": "The Service Locator pattern maintains a registry of services, allowing swappable mock services in tests.",
+          "analogy": "Calling the hotel concierge to connect you with room service or valet parking.",
+          "memory": "Dictionary<Type, object> lookup provides fast service reference."
+        }
+      },
+      {
+        "id": "u9-n9",
+        "title": "Strategy Pattern for Swappable AI",
+        "topic": "Patterns",
+        "q": {
+          "char": "vikram",
+          "speech": "The boss enters Enrage Mode and switches from Melee to Ranged attacks!",
+          "type": "multiple_choice",
+          "title": "Strategy Pattern Swapping",
+          "instruction": "How does the Strategy Pattern allow dynamic behavior changes at runtime?",
+          "code": "public interface IAttackStrategy { void ExecuteAttack(); }\n// In Boss:\npublic void SetStrategy(IAttackStrategy newStrategy) { this.strategy = newStrategy; }",
+          "choices": [
+            "The boss delegates attacks to an interchangeable strategy object that can be swapped at runtime",
+            "The boss deletes its script",
+            "The game restarts",
+            "The boss becomes invisible"
+          ],
+          "answer": 0,
+          "summary": "The Strategy pattern defines a family of swappable algorithms, letting boss behavior vary dynamically.",
+          "analogy": "A chess player switching from a defensive strategy to an aggressive offensive strategy.",
+          "memory": "Swapping strategy pointer changes execution target without rebuilding GameObject."
+        }
+      },
+      {
+        "id": "u9-n10",
+        "title": "Unit 9 Milestone Trial: Design Patterns Apex",
+        "topic": "Patterns",
+        "q": {
+          "char": "duo",
+          "speech": "DESIGN PATTERNS BOSS! Which pattern should you combine with Object Pooling for particle effects?",
+          "type": "multiple_choice",
+          "title": "Flyweight & Pool Synergy",
+          "instruction": "What pattern shares unchanging particle geometry while Object Pooling reuses active particle instances?",
+          "code": "// High Performance 10,000 Particle Architecture:",
+          "choices": [
+            "Flyweight Pattern (shared static data) + Object Pool (instance recycling)",
+            "Singleton + Switch statement",
+            "LINQ + Thread.Sleep",
+            "10,000 separate MonoBehaviours"
+          ],
+          "answer": 0,
+          "summary": "The Flyweight pattern shares immutable data across instances, while Object Pooling recycles the active objects.",
+          "analogy": "10,000 soldiers wearing the exact same uniform design, recycled in waves.",
+          "memory": "Minimal per-instance memory combined with zero-allocation recycling."
+        }
+      }
+    ]
+  },
+  {
+    "unit": 10,
+    "title": "Pro Profiling, GC Optimization & Burst/Jobs",
+    "badge": "UNIT 10 · PRO PERFORMANCE & HIGH FPS",
+    "desc": "Garbage collection internals, NonAlloc queries, StringBuilder, Profiler, and Burst compiler.",
+    "colorClass": "u10",
+    "guidebook": {
+      "summary": "Master the art of 120 FPS game development, zero-allocation C#, memory profiling, and SIMD multi-threading.",
+      "tips": [
+        "Physics.RaycastNonAlloc avoids generating an array on the heap every query.",
+        "Use StringBuilder instead of string concatenation in Update() loops.",
+        "Beware boxing: casting an int or struct to an object or interface creates a heap allocation.",
+        "The Unity Job System and Burst compiler compile C# into high-performance native machine code."
+      ]
+    },
+    "lessons": [
+      {
+        "id": "u10-n1",
+        "title": "Garbage Collection Demystified",
+        "topic": "Profiling",
+        "q": {
+          "char": "vikram",
+          "speech": "Why did our mobile game stutter every 8 seconds during the boss fight?",
+          "type": "multiple_choice",
+          "title": "GC Stop-The-World Spike",
+          "instruction": "What happens when the Managed Heap runs out of room for new allocations?",
+          "code": "// Continuous heap allocations in Update():\nvoid Update() {\n    string msg = \"Player Score: \" + score; // ALLOC!\n}",
+          "choices": [
+            "The Garbage Collector halts the game to scan memory and collect garbage (GC Pause)",
+            "The battery overheats",
+            "The screen turns grey",
+            "The frame rate permanently locks at 10 FPS"
+          ],
+          "answer": 0,
+          "summary": "When the heap fills up, the Boehm GC halts execution to trace roots and reclaim memory, causing a visible hitch.",
+          "analogy": "A kitchen garbage can overflowing: the chef has to stop cooking to drag the heavy bin outside.",
+          "memory": "Traces memory graph from registers and stack roots; mark and sweep phase pause."
+        }
+      },
+      {
+        "id": "u10-n2",
+        "title": "String Allocations & StringBuilder",
+        "topic": "Profiling",
+        "q": {
+          "char": "junior",
+          "speech": "Stop string garbage in Update()! Which tool creates zero-garbage formatted text?",
+          "type": "multiple_choice",
+          "title": "StringBuilder Buffer",
+          "instruction": "Why does StringBuilder prevent garbage collection churn?",
+          "code": "System.Text.StringBuilder sb = new System.Text.StringBuilder(64);\nsb.Clear();\nsb.Append(\"FPS: \").Append(fps);\nfpsText.SetText(sb);",
+          "choices": [
+            "It modifies an internal reusable character buffer without allocating new string objects on the heap",
+            "It converts strings into integers",
+            "It bypasses the CPU cache",
+            "It compresses text into ZIP format"
+          ],
+          "answer": 0,
+          "summary": "Strings in C# are immutable (any edit creates a brand new string). StringBuilder reuses an internal char array.",
+          "analogy": "Using a dry-erase whiteboard instead of burning through a new notepad sheet every 16 milliseconds.",
+          "memory": "Fixed char[] array buffer; zero garbage allocations when within pre-allocated capacity."
+        }
+      },
+      {
+        "id": "u10-n3",
+        "title": "NonAlloc Physics Queries",
+        "topic": "Profiling",
+        "q": {
+          "char": "vikram",
+          "speech": "Replace Physics.RaycastAll() with the zero-allocation pro version!",
+          "type": "multiple_choice",
+          "title": "RaycastNonAlloc Buffer Pass",
+          "instruction": "Why does Physics.RaycastNonAlloc produce zero heap allocations?",
+          "code": "private RaycastHit[] hitBuffer = new RaycastHit[16];\n// In Update():\nint hitCount = Physics.RaycastNonAlloc(ray, hitBuffer, 100f);",
+          "choices": [
+            "You pass in a pre-allocated array buffer that PhysX populates in-place",
+            "It only hits non-physical objects",
+            "It runs on the GPU raster pipeline",
+            "It skips raycast checks"
+          ],
+          "answer": 0,
+          "summary": "RaycastAll creates a new RaycastHit[] array every call. RaycastNonAlloc populates your existing buffer for 0 bytes GC alloc.",
+          "analogy": "Handing the cashier your own reusable shopping bag instead of buying a new plastic bag every item.",
+          "memory": "Native PhysX writes directly into the pinned managed array pointer without heap alloc."
+        }
+      },
+      {
+        "id": "u10-n4",
+        "title": "Boxing & Unboxing Traps",
+        "topic": "Profiling",
+        "q": {
+          "char": "duo",
+          "speech": "HIDDEN ALLOCATION TRAP! Spot the boxing allocation in this code!",
+          "type": "multiple_choice",
+          "title": "Value Type Boxing",
+          "instruction": "What is Boxing in C#?",
+          "code": "int score = 100;\nobject boxedScore = score; // BOXING ALLOCATION!",
+          "choices": [
+            "Converting a value type (int, struct) to an object or interface reference, allocating memory on the Heap",
+            "Packing items into a game loot box",
+            "Drawing 3D collider bounds",
+            "Compressing game textures"
+          ],
+          "answer": 0,
+          "summary": "Boxing wraps a stack value inside a heap object wrapper, triggering unexpected GC allocations in game loops.",
+          "analogy": "Wrapping an individual coin in an expensive cardboard shipping package just to hand it to a friend.",
+          "memory": "Allocates 16-byte object header on Heap + copies value into payload; unboxing extracts value back."
+        }
+      },
+      {
+        "id": "u10-n5",
+        "title": "Caching Component References & Hashes",
+        "topic": "Profiling",
+        "q": {
+          "char": "lily",
+          "speech": "Never call GetComponent<Rigidbody>() inside Update()! What should you do instead?",
+          "type": "multiple_choice",
+          "title": "Component Caching Pattern",
+          "instruction": "What is the correct performance practice for component access?",
+          "code": "private Rigidbody rb;\nvoid Awake() {\n    rb = GetComponent<Rigidbody>(); // Cache once!\n}\nvoid FixedUpdate() {\n    rb.linearVelocity = moveDir * speed; // Zero search overhead\n}",
+          "choices": [
+            "Cache the component in Awake()/Start() into a private variable",
+            "Call GetComponent every frame",
+            "Delete Rigidbody",
+            "Make Rigidbody static"
+          ],
+          "answer": 0,
+          "summary": "GetComponent searches native GameObject component arrays. Caching it in Awake stores a direct pointer for O(1) access.",
+          "analogy": "Saving your doctor phone number in your contacts instead of searching the yellow pages every time you call.",
+          "memory": "Direct pointer dereference vs native engine component table traversal."
+        }
+      },
+      {
+        "id": "u10-n6",
+        "title": "Deep Dive into Unity Profiler",
+        "topic": "Profiling",
+        "q": {
+          "char": "vikram",
+          "speech": "Which column in the Unity Profiler hierarchy reveals hidden GC spikes?",
+          "type": "multiple_choice",
+          "title": "Profiler GC Alloc Column",
+          "instruction": "Which profiler column shows exactly how many bytes of heap memory a method allocates per frame?",
+          "code": "// Look at Unity Profiler hierarchy:",
+          "choices": [
+            "GC Alloc",
+            "Total %",
+            "Time ms",
+            "Calls"
+          ],
+          "answer": 0,
+          "summary": "The GC Alloc column shows exact byte allocations per function call. In 60 FPS loops, it should read 0 B!",
+          "analogy": "A calorie counter for your code: spotting which function is eating up the memory budget.",
+          "memory": "Unity instrumentation tracks thread-local allocator byte counters per profile marker."
+        }
+      },
+      {
+        "id": "u10-n7",
+        "title": "Memory Profiler: Unloaded Asset Leaks",
+        "topic": "Profiling",
+        "q": {
+          "char": "junior",
+          "speech": "Textures from Level 1 are still taking up 500 MB in Level 2! How do you purge them?",
+          "type": "multiple_choice",
+          "title": "Unload Unused Assets",
+          "instruction": "Which method unloads unused assets from memory after changing scenes?",
+          "code": "Resources.UnloadUnusedAssets();",
+          "choices": [
+            "Resources.UnloadUnusedAssets()",
+            "GC.Collect() only",
+            "Camera.main.Reset()",
+            "Application.Quit()"
+          ],
+          "answer": 0,
+          "summary": "Resources.UnloadUnusedAssets walks the native object graph and frees textures, audio, and meshes with no references.",
+          "analogy": "Clearing out the storage room of props from the previous play that are no longer needed.",
+          "memory": "Native C++ asset garbage collector releases GPU texture and audio buffer handles."
+        }
+      },
+      {
+        "id": "u10-n8",
+        "title": "Structs & in/ref Readonly Modifiers",
+        "topic": "Profiling",
+        "q": {
+          "char": "vikram",
+          "speech": "Passing a 64-byte CombatData struct without copying 64 bytes on the stack!",
+          "type": "multiple_choice",
+          "title": "in Parameter Passing",
+          "instruction": "What does the \"in\" keyword do when passing large structs to methods in C#?",
+          "code": "public void ProcessCombat(in CombatData data) {\n    // data cannot be modified; passed by reference!\n}",
+          "choices": [
+            "Passes the struct by reference (pointer) while making it readonly, avoiding memory copying overhead",
+            "Copies the struct twice",
+            "Converts struct to class",
+            "Deletes the struct"
+          ],
+          "answer": 0,
+          "summary": "The in modifier passes value types by reference, saving stack memory copy overhead while enforcing immutability.",
+          "analogy": "Showing someone your driving license through a glass window instead of giving them a photocopy.",
+          "memory": "Passes 8-byte pointer instead of 64-byte stack copy; compiler forbids mutations."
+        }
+      },
+      {
+        "id": "u10-n9",
+        "title": "Unity C# Job System & Burst Compiler",
+        "topic": "Profiling",
+        "q": {
+          "char": "vikram",
+          "speech": "Simulate 50,000 arrows on screen at 120 FPS using multi-threading!",
+          "type": "multiple_choice",
+          "title": "Burst Compiler & Job System",
+          "instruction": "What does the Unity Burst Compiler do to your C# math code?",
+          "code": "[BurstCompile]\npublic struct MoveArrowsJob : IJobParallelFor {\n    public void Execute(int index) { /* SIMD math */ }\n}",
+          "choices": [
+            "Compiles high-performance C# jobs into optimized native SIMD machine code using LLVM",
+            "Translates C# into Python",
+            "Uploads arrows to the cloud",
+            "Draws sprites faster"
+          ],
+          "answer": 0,
+          "summary": "Burst uses LLVM to compile High-Performance C# into vector-optimized native CPU instructions (AVX/NEON).",
+          "analogy": "Swapping a delivery bicycle for a fleet of supersonic transport jets operating in parallel.",
+          "memory": "Native SIMD assembly with autovectorization and zero garbage collector overhead."
+        }
+      },
+      {
+        "id": "u10-n10",
+        "title": "THE GRAND 100TH MILESTONE: The Lead Architect Legendary Trial!",
+        "topic": "Profiling",
+        "q": {
+          "char": "duo",
+          "speech": "GRAND 100TH MILESTONE TRIAL! You stand at the pinnacle of game development! Which combination defines a world-class 120 FPS Unity C# game architecture?",
+          "type": "multiple_choice",
+          "title": "The Master Game Architecture Apex",
+          "instruction": "What architectural pillars guarantee a rock-solid, high-performance C# game?",
+          "code": "// The Code_Duo Architectural Creed:\n1. Zero GC allocations in core 60/120 FPS update loops\n2. Decoupled systems using events and interfaces\n3. Value types for physics/math; Object pools for dynamic entities\n4. Data-driven configs powered by ScriptableObjects",
+          "choices": [
+            "All 4 architectural pillars: Zero GC in loops, Decoupled events, Object pools, and Data-driven design!",
+            "Put all code into Update() with string concatenations",
+            "Use Thread.Sleep() for timers",
+            "Never use structs"
+          ],
+          "answer": 0,
+          "summary": "Congratulations! You have mastered all 100 lessons of the C# + Unity Gamedev Curriculum! You are now a certified Lead Gameplay Architect!",
+          "analogy": "You hold the golden Master Crown of Game Development!",
+          "memory": "Total neural synthesis achieved: memory models, engine execution, mathematics, and architectural mastery!"
+        }
+      }
+    ]
+  }
+]

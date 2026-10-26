@@ -1,0 +1,57 @@
+{
+  "version": "1.0",
+  "appName": "Code_Duo",
+  "lastSynced": "2026-10-26T22:45:00.000Z",
+  "accounts": {
+    "Sanju2206": {
+      "username": "Sanju2206",
+      "password": "CD_sanju@22",
+      "name": "Sanju (Lead Dev)",
+      "avatar": "👨‍💻",
+      "role": "Gameplay Systems Architect (Lead)",
+      "isPremium": true,
+      "badge": "💎 SUPER DUO",
+      "state": {
+        "xp": 350,
+        "streak": 1,
+        "gems": 9999,
+        "hearts": "∞",
+        "isPremium": true,
+        "level": 4,
+        "rankTitle": "Super Gameplay Architect",
+        "freezes": 5,
+        "unlockedUnits": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+        "completedLessons": [],
+        "openedChests": [],
+        "unlockedBadges": ["b_first"],
+        "lastStreakDate": "Mon Oct 26 2026",
+        "activeBoost": "2x_xp_active"
+      }
+    },
+    "Scaria2584": {
+      "username": "Scaria2584",
+      "password": "CD_scaria@25",
+      "name": "Scaria (Designer)",
+      "avatar": "⚡",
+      "role": "Physics & Level Designer",
+      "isPremium": true,
+      "badge": "💎 SUPER DUO",
+      "state": {
+        "xp": 280,
+        "streak": 1,
+        "gems": 9999,
+        "hearts": "∞",
+        "isPremium": true,
+        "level": 3,
+        "rankTitle": "Super Physics Designer",
+        "freezes": 5,
+        "unlockedUnits": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+        "completedLessons": [],
+        "openedChests": [],
+        "unlockedBadges": ["b_first"],
+        "lastStreakDate": "Mon Oct 26 2026",
+        "activeBoost": "2x_xp_active"
+      }
+    }
+  }
+}
