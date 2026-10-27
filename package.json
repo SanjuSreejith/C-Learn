@@ -1,0 +1,23 @@
+{
+  "name": "code-duo-csharp-unity",
+  "version": "2.0.0",
+  "description": "Interactive Duolingo-style C# and Unity Learning Platform with 100 Lessons, 1000 Questions, AI Cognitive Decision Modeling, and Automated GitHub Sync",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "build": "node build_refined_app.js",
+    "generate-questions": "node generate_1000_questions.js",
+    "test": "node test_app.js"
+  },
+  "keywords": [
+    "csharp",
+    "unity",
+    "duolingo",
+    "gamification",
+    "education",
+    "bayesian-knowledge-tracing",
+    "gamedev"
+  ],
+  "author": "Sanju Sreejith",
+  "license": "MIT"
+}

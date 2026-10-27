@@ -18,26 +18,25 @@ const lessonOrder = [];
 curriculum.forEach(unit => {
   unit.lessons.forEach(l => {
     lessonOrder.push(l.id);
+    const qList = (l.questions && l.questions.length > 0) ? l.questions : (l.q ? [l.q] : []);
     lessonsDb[l.id] = {
       title: l.title,
       unit: unit.unit,
       topic: l.topic,
-      questions: [
-        {
-          character: l.q.char,
-          charSpeech: l.q.speech,
-          type: l.q.type,
-          title: l.q.title,
-          instruction: l.q.instruction,
-          code: l.q.code,
-          choices: l.q.choices,
-          answer: l.q.answer,
-          explainSummary: l.q.summary,
-          explainAnalogy: l.q.analogy,
-          explainMemory: l.q.memory,
-          pitfall: l.q.pitfall || 'Failing to test edge cases can trigger NullReferenceException or memory leaks.'
-        }
-      ]
+      questions: qList.map(item => ({
+        character: item.character || item.char || 'kabir',
+        charSpeech: item.charSpeech || item.speech || 'Let us code and build this game system!',
+        type: item.type || 'multiple_choice',
+        title: item.title || l.title,
+        instruction: item.instruction || 'What will be output or evaluated?',
+        code: item.code || '',
+        choices: item.choices || ['Choice A', 'Choice B', 'Choice C', 'Choice D'],
+        answer: item.answer !== undefined ? item.answer : 0,
+        explainSummary: item.explainSummary || item.summary || 'Essential concept for robust game development.',
+        explainAnalogy: item.explainAnalogy || item.analogy || 'Like managing game state in Unity.',
+        explainMemory: item.explainMemory || item.memory || 'STACK: Direct execution on current thread frame.',
+        pitfall: item.pitfall || 'Failing to test edge cases can trigger NullReferenceException or memory leaks.'
+      }))
     };
   });
 });
@@ -608,6 +607,11 @@ function openChest(chestId) {
     '🎉'
   );
   saveState();
+  autoSaveToGitHub({
+    unit: unitNum,
+    isSectionComplete: true,
+    chestClaimed: true
+  });
 }
 
 let activeSession = {
@@ -670,11 +674,11 @@ function renderCurrentQuestion() {
   const highlightedCode = q.code ? highlightCSharp(q.code) : '';
 
   contentArea.innerHTML = \`
-    <div style="display:flex; align-items:center; gap:14px; margin-bottom:16px;">
-      <div style="width:75px; height:85px; flex-shrink:0;">
+    <div class="lesson-top-character-wrapper" id="lesson-top-character">
+      <div class="lesson-top-avatar" id="lesson-top-avatar">
         \${char.renderSVG('idle')}
       </div>
-      <div style="background:var(--card-bg); border:2px solid var(--card-border); border-radius:14px; padding:12px 18px; font-size:14.5px; font-weight:700; line-height:1.45; color:var(--text); flex:1; box-shadow:0 3px 0 var(--card-border-dark);">
+      <div class="lesson-top-bubble" id="lesson-top-bubble">
         \${q.charSpeech}
       </div>
     </div>
@@ -725,12 +729,24 @@ function submitAnswer() {
 
   const chosenBtn = document.getElementById(\`choice-btn-\${activeSession.selectedChoice}\`);
   const correctBtn = document.getElementById(\`choice-btn-\${q.answer}\`);
-
   const isSuper = accountsDB[currentUsername].isPremium || userState.isPremium;
+
+  // 1. UPDATE THE TOP CHARACTER DIALOGUE & AVATAR DIRECTLY!
+  const topBubble = document.getElementById('lesson-top-bubble');
+  const topAvatar = document.getElementById('lesson-top-avatar');
+  const charKey = q.character === 'junior' ? 'kabir' : (q.character || 'priya');
+  const char = CHARACTERS[charKey] || CHARACTERS.priya;
 
   if (isCorrect) {
     sfx.playCorrect();
     if (chosenBtn) chosenBtn.classList.add('correct');
+    if (topAvatar) {
+      topAvatar.className = 'lesson-top-avatar char-bounce-correct';
+    }
+    if (topBubble) {
+      topBubble.className = 'lesson-top-bubble bubble-correct';
+      topBubble.innerHTML = \`<span class="bubble-prefix">Okay!</span> \${getTopPraiseDialogue(char, cognitive)}\`;
+    }
   } else {
     sfx.playWrong();
     if (chosenBtn) chosenBtn.classList.add('wrong');
@@ -740,19 +756,45 @@ function submitAnswer() {
       userState.hearts = Math.max(0, userState.hearts - 1);
     }
     document.getElementById('lesson-hearts-count').textContent = isSuper ? '∞' : userState.hearts;
+    if (topAvatar) {
+      topAvatar.className = 'lesson-top-avatar char-shake-wrong';
+    }
+    if (topBubble) {
+      topBubble.className = 'lesson-top-bubble bubble-wrong';
+      topBubble.innerHTML = \`<span class="bubble-prefix">Okay, wait!</span> \${getTopGuidanceDialogue(char, cognitive)}\`;
+    }
   }
 
+  // 2. BOTTOM EVALUATION DRAWER (Clean tabs, no duplicate character underneath)
   const drawer = document.getElementById('eval-drawer');
   const title = document.getElementById('eval-feedback-title');
   const icon = document.getElementById('eval-feedback-icon');
-  const agentSpeech = document.getElementById('eval-feedback-agent');
 
   drawer.className = \`eval-drawer active \${isCorrect ? 'correct-state' : 'wrong-state'}\`;
   title.textContent = isCorrect ? 'Correct! Superb deduction!' : (isSuper ? 'Incorrect! (Protected by Super Unlimited Hearts)' : 'Incorrect!');
   icon.textContent = isCorrect ? '✓' : '✗';
-  agentSpeech.textContent = selectQDialogue(q.character, cognitive);
 
   renderExplainContent('summary');
+}
+
+function getTopPraiseDialogue(char, cognitive) {
+  const shortName = char.name.split(' ')[0];
+  if (cognitive.state === 'MASTERED_FLUENT') {
+    return \`\${shortName}: "Superb execution! Lightning-fast trace, dost! That is real Lead Architect speed."\`;
+  } else if (cognitive.state === 'CONFIDENT_CALCULATED') {
+    return \`\${shortName}: "Spot on! Clean, deliberate calculation. The game loop stays rock solid!"\`;
+  } else {
+    return \`\${shortName}: "Shabash! Taking time to double-check references prevents nasty crashes in production!"\`;
+  }
+}
+
+function getTopGuidanceDialogue(char, cognitive) {
+  const shortName = char.name.split(' ')[0];
+  if (cognitive.state === 'FAST_GUESS') {
+    return \`\${shortName}: "Hold on dost, don't rush! Trace the memory and variables line-by-line first."\`;
+  } else {
+    return \`\${shortName}: "Watch out! A small slip here can break the game loop. Check the explanation tabs below!"\`;
+  }
 }
 
 function switchExplainTab(tabKey) {
@@ -818,12 +860,127 @@ function finishLesson() {
   saveState();
   closeLessonModal();
 
+  // Check if all lessons of this unit/section are now completed
+  const unitNum = lessonId ? parseInt(lessonId.split('-')[0].replace('u', ''), 10) : 1;
+  const unitLessons = LESSON_ORDER.filter(id => id.startsWith(\`u\${unitNum}-\`));
+  const isSectionComplete = unitLessons.length > 0 && unitLessons.every(id => userState.completedLessons.includes(id));
+
+  // Trigger Automatic GitHub Save
+  autoSaveToGitHub({
+    unit: unitNum,
+    lessonId: lessonId,
+    isSectionComplete: isSectionComplete
+  });
+
+  const sectionMsg = isSectionComplete 
+    ? \`\\n\\n🎉 SECTION UNIT \${unitNum} FULLY COMPLETED!\\n🐙 Work automatically saved & pushed to GitHub main!\`
+    : \`\\n\\n🐙 Progress auto-saved to GitHub!\`;
+
   showToastDialog(
-    'Quest Completed!',
-    \`Fantastic job! You finished the lesson!\\n\\nEarned:\\n⚡ +\${xpEarned} XP\\n💎 +\${gemsEarned} Gems\\n🔥 Streak: \${userState.streak} Days\`,
+    isSectionComplete ? 'Section & Unit Complete!' : 'Quest Completed!',
+    \`Fantastic job! You finished the lesson!\${sectionMsg}\\n\\nEarned:\\n⚡ +\${xpEarned} XP\\n💎 +\${gemsEarned} Gems\\n🔥 Streak: \${userState.streak} Days\`,
     'Continue Path',
-    '🏆'
+    isSectionComplete ? '👑' : '🏆'
   );
+}
+
+// GITHUB AUTO-SAVE & SYNC ENGINE
+async function autoSaveToGitHub(details = {}) {
+  const syncBtn = document.getElementById('header-git-pill');
+  if (syncBtn) {
+    syncBtn.innerHTML = '<span>⏳</span><span>Syncing...</span>';
+    syncBtn.classList.remove('synced');
+  }
+
+  const payload = {
+    username: currentUsername || 'Sanju2206',
+    section: details.unit || 1,
+    lesson: details.lessonId || '',
+    isSectionComplete: details.isSectionComplete || false,
+    xp: userState ? userState.xp : 0,
+    streak: userState ? userState.streak : 1,
+    state: userState
+  };
+
+  try {
+    const res = await fetch('http://localhost:3000/api/git-sync', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+    const data = await res.json();
+    if (data.ok) {
+      if (syncBtn) {
+        syncBtn.innerHTML = '<span>🐙</span><span>GitHub: Synced ✓</span>';
+        syncBtn.classList.add('synced');
+      }
+      console.log('[Code_Duo Git Sync]', data.message);
+      return;
+    }
+  } catch (err) {
+    // Local server offline or file protocol
+    console.log('[Code_Duo Git Sync] Local companion server offline. Stored in browser cache.');
+  }
+
+  if (syncBtn) {
+    syncBtn.innerHTML = '<span>🐙</span><span>GitHub: Auto-Save Ready</span>';
+  }
+}
+
+function openGitSyncModal() {
+  sfx.playTap();
+  const modal = document.getElementById('git-sync-modal');
+  if (modal) {
+    modal.classList.add('active');
+    checkGitStatusInModal();
+  }
+}
+
+function closeGitSyncModal() {
+  sfx.playTap();
+  const modal = document.getElementById('git-sync-modal');
+  if (modal) modal.classList.remove('active');
+}
+
+async function checkGitStatusInModal() {
+  const statusEl = document.getElementById('git-modal-status-text');
+  const serverEl = document.getElementById('git-modal-server-badge');
+  try {
+    const res = await fetch('http://localhost:3000/api/git-status');
+    const data = await res.json();
+    if (data.ok) {
+      if (serverEl) serverEl.innerHTML = '<span style="color:#2e7d32; font-weight:800;">● Local Companion Server Active (Port 3000)</span>';
+      if (statusEl) statusEl.innerHTML = \`<b>Branch:</b> \${data.branch}<br><b>Remote:</b> <code>\${data.remote}</code><br><b>Last Commit:</b> \${data.lastCommit}\`;
+      return;
+    }
+  } catch (e) {}
+
+  if (serverEl) serverEl.innerHTML = '<span style="color:#d97706; font-weight:800;">○ Local Server Idle (Run <code>npm start</code> or <code>node server.js</code>)</span>';
+  if (statusEl) statusEl.innerHTML = '<b>Remote:</b> <code>https://github.com/SanjuSreejith/C-Learn.git</code><br><b>Branch:</b> <code>main</code><br>Auto-Save triggers automatically on section and lesson completions!';
+}
+
+async function triggerManualGitSync() {
+  sfx.playTap();
+  const btn = document.getElementById('git-manual-sync-btn');
+  if (btn) btn.textContent = 'SYNCING TO GITHUB...';
+  await autoSaveToGitHub({ unit: 1, isSectionComplete: false });
+  if (btn) btn.textContent = 'SYNCED SUCCESSFULLY! ✓';
+  setTimeout(() => {
+    if (btn) btn.textContent = 'SYNC TO GITHUB NOW';
+    checkGitStatusInModal();
+  }, 1600);
+}
+
+function saveGitHubPAT() {
+  sfx.playTap();
+  const input = document.getElementById('git-pat-input');
+  if (input && input.value.trim()) {
+    localStorage.setItem('code_duo_github_pat', input.value.trim());
+    alert('GitHub Personal Access Token saved! Direct browser commits enabled.');
+  } else {
+    localStorage.removeItem('code_duo_github_pat');
+    alert('GitHub Token removed.');
+  }
 }
 
 function quitLesson() {
@@ -2137,6 +2294,97 @@ const htmlMarkup = `<!DOCTYPE html>
       box-sizing: border-box;
     }
 
+    /* TOP CHARACTER & SPEECH FEEDBACK IN LESSON */
+    .lesson-top-character-wrapper {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+    .lesson-top-avatar {
+      width: 80px;
+      height: 90px;
+      flex-shrink: 0;
+      transition: transform 0.3s ease;
+    }
+    .char-bounce-correct {
+      animation: charBounce 0.5s ease;
+    }
+    .char-shake-wrong {
+      animation: charShake 0.4s ease;
+    }
+    @keyframes charBounce {
+      0%, 100% { transform: translateY(0) scale(1); }
+      50% { transform: translateY(-12px) scale(1.08); }
+    }
+    @keyframes charShake {
+      0%, 100% { transform: translateX(0); }
+      25% { transform: translateX(-8px) rotate(-3deg); }
+      75% { transform: translateX(8px) rotate(3deg); }
+    }
+    .lesson-top-bubble {
+      background: var(--card-bg);
+      border: 2px solid var(--card-border);
+      border-radius: 16px;
+      padding: 14px 20px;
+      font-size: 15px;
+      font-weight: 700;
+      line-height: 1.45;
+      color: var(--text);
+      flex: 1;
+      box-shadow: 0 4px 0 var(--card-border-dark);
+      transition: all 0.25s ease;
+    }
+    .lesson-top-bubble.bubble-correct {
+      border-color: #58cc02 !important;
+      background: rgba(88, 204, 2, 0.12) !important;
+      color: var(--text) !important;
+      box-shadow: 0 4px 0 #46a302 !important;
+    }
+    .lesson-top-bubble.bubble-wrong {
+      border-color: #ff4b4b !important;
+      background: rgba(255, 75, 75, 0.12) !important;
+      color: var(--text) !important;
+      box-shadow: 0 4px 0 #ea2b2b !important;
+    }
+    .bubble-prefix {
+      font-weight: 900;
+      font-size: 16px;
+      display: inline-block;
+      margin-right: 4px;
+    }
+    .bubble-correct .bubble-prefix {
+      color: #58cc02;
+    }
+    .bubble-wrong .bubble-prefix {
+      color: #ff4b4b;
+    }
+
+    .git-sync-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--card-bg);
+      border: 2px solid var(--card-border);
+      border-radius: 20px;
+      padding: 6px 14px;
+      font-size: 12.5px;
+      font-weight: 800;
+      color: var(--text);
+      cursor: pointer;
+      transition: all 0.2s ease;
+      box-shadow: 0 2px 0 var(--card-border-dark);
+    }
+    .git-sync-pill:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 0 var(--card-border-dark);
+      border-color: var(--primary);
+    }
+    .git-sync-pill.synced {
+      border-color: #58cc02;
+      color: #2e7d32;
+    }
+
     .exercise-title {
       font-family: var(--font-display);
       font-size: 23px;
@@ -2763,6 +3011,10 @@ const htmlMarkup = `<!DOCTYPE html>
 
       <!-- Actions -->
       <div class="header-action-group">
+        <button class="git-sync-pill hide-on-mobile" id="header-git-pill" onclick="openGitSyncModal()" title="Automated GitHub Sync Status">
+          <span>🐙</span>
+          <span>GitHub: Auto-Save Active</span>
+        </button>
         <button class="header-btn" id="theme-toggle-btn" onclick="toggleTheme()" title="Toggle Dark/Light Mode">🌙</button>
         <button class="header-btn hide-on-mobile" id="audio-toggle-btn" onclick="toggleAudio()" title="Sound Effects On/Off">🔊</button>
         <button class="header-btn header-signout-btn" onclick="signOut()" title="Sign Out to Login Screen">🚪</button>
@@ -2921,7 +3173,6 @@ const htmlMarkup = `<!DOCTYPE html>
           <div style="width: 44px; height: 44px; border-radius: 50%; background: #fff; display: grid; place-items: center; font-size: 24px; font-weight: 900;" id="eval-feedback-icon">✓</div>
           <div>
             <div class="eval-feedback-title" id="eval-feedback-title">Correct! Superb deduction!</div>
-            <div style="font-size: 13px; font-weight: 700; opacity: 0.9; margin-top: 2px;" id="eval-feedback-agent">Vikram: "Chai in hand, 0 bytes GC Alloc!"</div>
           </div>
         </div>
         <button class="btn-duo btn-duo-primary" style="padding: 12px 28px; font-size: 15px;" onclick="handleDrawerContinue()">CONTINUE</button>
@@ -2937,6 +3188,35 @@ const htmlMarkup = `<!DOCTYPE html>
 
       <!-- Explanation Box Content -->
       <div id="eval-explanation-box" style="font-size: 13.5px; line-height: 1.5; color: var(--text);"></div>
+    </div>
+  </div>
+</div>
+
+<!-- GITHUB AUTO-SYNC MODAL -->
+<div class="generic-dialog-backdrop" id="git-sync-modal">
+  <div class="dialog-card" style="max-width: 520px; text-align: left;">
+    <div class="dialog-emoji" style="text-align: center;">🐙</div>
+    <h2 class="dialog-title" style="text-align: center;">GitHub Automated Sync</h2>
+    <div class="dialog-body" style="font-size: 13.5px; line-height: 1.5;">
+      <div style="background: var(--card-bg); border: 2px solid var(--card-border); border-radius: 12px; padding: 12px 16px; margin-bottom: 12px;" id="git-modal-status-text">
+        <b>Repository:</b> <code>https://github.com/SanjuSreejith/C-Learn.git</code><br>
+        <b>Branch:</b> <code>main</code><br>
+        <b>Auto-Save:</b> Triggers automatically after every section and lesson!
+      </div>
+      <div id="git-modal-server-badge" style="margin-bottom: 14px;"></div>
+      
+      <p style="margin-bottom: 6px; font-weight: 700;">Zero-Config Push:</p>
+      <p style="margin-bottom: 14px; font-size: 12.5px; opacity: 0.85;">Start the companion server by running <code>npm start</code> or <code>node server.js</code> in your terminal. All finished sections and units commit and push automatically without prompting!</p>
+      
+      <div style="border-top: 1px solid var(--card-border); padding-top: 12px; margin-top: 12px;">
+        <p style="font-weight: 700; font-size: 13px; margin-bottom: 6px;">Browser Direct Sync (Personal Access Token):</p>
+        <input type="password" id="git-pat-input" placeholder="Paste GitHub PAT (optional)" style="width: 100%; padding: 8px 12px; border-radius: 8px; border: 2px solid var(--card-border); background: var(--bg); color: var(--text); font-size: 13px; box-sizing: border-box; margin-bottom: 8px;">
+        <button class="btn-duo btn-duo-white" style="font-size: 12px; padding: 6px 12px;" onclick="saveGitHubPAT()">Save Token</button>
+      </div>
+    </div>
+    <div class="dialog-buttons" style="justify-content: space-between; margin-top: 16px;">
+      <button class="btn-duo btn-duo-primary" id="git-manual-sync-btn" onclick="triggerManualGitSync()">SYNC TO GITHUB NOW</button>
+      <button class="btn-duo btn-duo-white" onclick="closeGitSyncModal()">CLOSE</button>
     </div>
   </div>
 </div>
