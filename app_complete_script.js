@@ -207,6 +207,10 @@ let accountsDB = JSON.parse(localStorage.getItem('code_duo_accounts_db')) || DEF
     if (!accountsDB[u].state.gems || accountsDB[u].state.gems > 500) {
       accountsDB[u].state.gems = (u === 'Sanju2206' ? 185 : 140);
     }
+    if (!accountsDB[u].state.streak || accountsDB[u].state.streak < 2) {
+      accountsDB[u].state.streak = 2;
+    }
+    accountsDB[u].state.lastStreakDate = new Date().toDateString();
   }
 });
 

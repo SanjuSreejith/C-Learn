@@ -1,7 +1,7 @@
 {
   "version": "1.0",
   "appName": "Code_Duo",
-  "lastSynced": "2026-10-26T22:45:00.000Z",
+  "lastSynced": "2026-10-27T19:30:00.000Z",
   "accounts": {
     "Sanju2206": {
       "username": "Sanju2206",
@@ -10,22 +10,32 @@
       "avatar": "👨‍💻",
       "role": "Gameplay Systems Architect (Lead)",
       "isPremium": true,
-      "badge": "💎 SUPER DUO",
+      "badge": "👑 SUPER DUO",
       "state": {
-        "xp": 350,
-        "streak": 1,
-        "gems": 9999,
+        "xp": 375,
+        "streak": 2,
+        "gems": 185,
         "hearts": "∞",
         "isPremium": true,
         "level": 4,
         "rankTitle": "Super Gameplay Architect",
         "freezes": 5,
         "unlockedUnits": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
-        "completedLessons": [],
+        "completedLessons": ["u1-n1"],
         "openedChests": [],
-        "unlockedBadges": ["b_first"],
-        "lastStreakDate": "Mon Oct 26 2026",
-        "activeBoost": "2x_xp_active"
+        "unlockedBadges": ["b_first", "b_wildfire"],
+        "lastStreakDate": "Tue Oct 27 2026",
+        "activeBoost": "2x_xp_active",
+        "bktKnowledge": {
+          "Variables": 0.88,
+          "Logic": 0.82,
+          "Engine": 0.78,
+          "OOP": 0.72,
+          "Physics": 0.68,
+          "Collections": 0.62,
+          "Events": 0.58,
+          "Profiling": 0.52
+        }
       }
     },
     "Scaria2584": {
@@ -35,22 +45,32 @@
       "avatar": "⚡",
       "role": "Physics & Level Designer",
       "isPremium": true,
-      "badge": "💎 SUPER DUO",
+      "badge": "👑 SUPER DUO",
       "state": {
-        "xp": 280,
-        "streak": 1,
-        "gems": 9999,
+        "xp": 305,
+        "streak": 2,
+        "gems": 140,
         "hearts": "∞",
         "isPremium": true,
         "level": 3,
         "rankTitle": "Super Physics Designer",
         "freezes": 5,
         "unlockedUnits": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
-        "completedLessons": [],
+        "completedLessons": ["u1-n1"],
         "openedChests": [],
-        "unlockedBadges": ["b_first"],
-        "lastStreakDate": "Mon Oct 26 2026",
-        "activeBoost": "2x_xp_active"
+        "unlockedBadges": ["b_first", "b_wildfire"],
+        "lastStreakDate": "Tue Oct 27 2026",
+        "activeBoost": "2x_xp_active",
+        "bktKnowledge": {
+          "Variables": 0.85,
+          "Logic": 0.80,
+          "Engine": 0.75,
+          "OOP": 0.70,
+          "Physics": 0.65,
+          "Collections": 0.60,
+          "Events": 0.55,
+          "Profiling": 0.50
+        }
       }
     }
   }

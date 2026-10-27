@@ -1,43 +1,63 @@
 // generate_1000_questions.js
 // Generates 10 high-quality, distinct gamedev C# questions for each of the 100 lessons (1,000 questions total).
+// With properly shuffled answer choices so the correct answer is uniformly distributed across A, B, C, D!
 
 const fs = require('fs');
 const curriculum = JSON.parse(fs.readFileSync('curriculum_data.json', 'utf8'));
 
-const CHARACTERS = ['vikram', 'priya', 'kabir', 'duo', 'lily', 'dev'];
+// Mulberry32 deterministic PRNG
+function shuffleChoices(choices, originalAnswer, seed) {
+  const items = choices.map((c, i) => ({ text: c, isCorrect: i === (originalAnswer || 0) }));
+  let a = seed;
+  function rand() {
+    let t = a += 0x6D2B79F5;
+    t = Math.imul(t ^ t >>> 15, t | 1);
+    t ^= t + Math.imul(t ^ t >>> 7, t | 61);
+    return ((t ^ t >>> 14) >>> 0) / 4294967296;
+  }
+  for (let i = items.length - 1; i > 0; i--) {
+    const j = Math.floor(rand() * (i + 1));
+    const tmp = items[i];
+    items[i] = items[j];
+    items[j] = tmp;
+  }
+  return {
+    choices: items.map(it => it.text),
+    answer: items.findIndex(it => it.isCorrect)
+  };
+}
 
 // Helper to create the 10 questions per lesson based on its unit, topic, and title
-function generateQuestionsForLesson(lesson, unit) {
-  const baseQ = lesson.q;
-  const questions = [];
+function generateQuestionsForLesson(lesson, unit, lessonIndex) {
+  const baseQ = lesson.q || (lesson.questions && lesson.questions[0]) || {};
+  const rawQuestions = [];
 
   // 1. Question 1: Core Concept & Syntax (Refined base question)
-  questions.push({
-    character: baseQ.char || 'kabir',
-    charSpeech: baseQ.speech || `Let's start with the core principle of ${lesson.title}:`,
+  rawQuestions.push({
+    character: baseQ.character || baseQ.char || 'kabir',
+    charSpeech: baseQ.charSpeech || baseQ.speech || `Let's master the core syntax of ${lesson.title}:`,
     type: 'multiple_choice',
     title: baseQ.title || `${lesson.title} - Fundamentals`,
     instruction: baseQ.instruction || 'What will be output or evaluated?',
     code: baseQ.code || `// ${lesson.title}\nint result = 0;\nConsole.WriteLine(result);`,
-    choices: baseQ.choices || ['0', '1', 'null', 'Error'],
-    answer: baseQ.answer !== undefined ? baseQ.answer : 0,
-    explainSummary: baseQ.summary || `Understanding ${lesson.title} is essential for robust gamedev architecture.`,
-    explainAnalogy: baseQ.analogy || `Like setting up your player's foundational state machine in Unity.`,
-    explainMemory: baseQ.memory || `STACK: Direct evaluation on the current execution frame.`,
+    rawChoices: baseQ.choices || ['0', '1', 'null', 'Compilation Error'],
+    rawAnswer: (baseQ.answer !== undefined) ? baseQ.answer : 0,
+    explainSummary: baseQ.explainSummary || baseQ.summary || `Understanding ${lesson.title} is essential for robust gamedev architecture.`,
+    explainAnalogy: baseQ.explainAnalogy || baseQ.analogy || `Like setting up your player's foundational state machine in Unity.`,
+    explainMemory: baseQ.explainMemory || baseQ.memory || `STACK: Direct evaluation on the current execution frame.`,
     pitfall: baseQ.pitfall || `Uninitialized references lead to NullReferenceException at runtime.`
   });
 
   // 2. Question 2: Execution & Output Prediction
-  const q2Char = 'priya';
-  questions.push({
-    character: q2Char,
+  rawQuestions.push({
+    character: 'priya',
     charSpeech: `Trace this snippet line-by-line! What value is sent to the debug console?`,
     type: 'multiple_choice',
     title: `${lesson.title} - Console Output Trace`,
     instruction: `Predict the output printed by this script:`,
     code: getOutputCode(lesson),
-    choices: getOutputChoices(lesson),
-    answer: 0,
+    rawChoices: getOutputChoices(lesson),
+    rawAnswer: 0,
     explainSummary: `Sequential execution updates local state in order before printing to the console.`,
     explainAnalogy: `Like calculating damage after armor reduction before displaying floating combat text.`,
     explainMemory: `L1 CPU Cache registers track fast integer and float variables on the stack.`,
@@ -45,16 +65,15 @@ function generateQuestionsForLesson(lesson, unit) {
   });
 
   // 3. Question 3: Bug Spotting & Code Correction
-  const q3Char = 'dev';
-  questions.push({
-    character: q3Char,
+  rawQuestions.push({
+    character: 'dev',
     charSpeech: `QA bug alert! Our automated stress test found a flaw in this snippet. Spot it:`,
     type: 'multiple_choice',
     title: `${lesson.title} - Spot the Bug`,
     instruction: `Which issue will occur when running this code?`,
     code: getBugCode(lesson),
-    choices: getBugChoices(lesson),
-    answer: 0,
+    rawChoices: getBugChoices(lesson),
+    rawAnswer: 0,
     explainSummary: `Recognizing standard C# syntax and runtime traps prevents production crashes.`,
     explainAnalogy: `Catching a null reference before launching an enemy projectile wave.`,
     explainMemory: `Dereferencing an address pointing to 0x0 throws an immediate CPU trap.`,
@@ -62,16 +81,15 @@ function generateQuestionsForLesson(lesson, unit) {
   });
 
   // 4. Question 4: Unity Gamedev Scenario
-  const q4Char = 'vikram';
-  questions.push({
-    character: q4Char,
+  rawQuestions.push({
+    character: 'vikram',
     charSpeech: `In a real production Unity project, how does this mechanic behave?`,
     type: 'multiple_choice',
     title: `${lesson.title} - Engine Application`,
     instruction: `Which Unity lifecycle or architectural rule applies here?`,
     code: getEngineCode(lesson),
-    choices: getEngineChoices(lesson),
-    answer: 0,
+    rawChoices: getEngineChoices(lesson),
+    rawAnswer: 0,
     explainSummary: `Unity's C++ native engine communicates across the C# scripting layer via managed wrappers.`,
     explainAnalogy: `Ensuring camera movement in LateUpdate follows player movement calculated in FixedUpdate.`,
     explainMemory: `P/Invoke and managed-to-native marshalling cost cycles; minimize cross-boundary calls.`,
@@ -79,16 +97,15 @@ function generateQuestionsForLesson(lesson, unit) {
   });
 
   // 5. Question 5: Keyword & Syntax Fill-in-the-Blank
-  const q5Char = 'lily';
-  questions.push({
-    character: q5Char,
+  rawQuestions.push({
+    character: 'lily',
     charSpeech: `Which C# keyword completes this statement properly?`,
     type: 'multiple_choice',
     title: `${lesson.title} - Keyword Precision`,
     instruction: `Select the correct keyword to replace [___]:`,
     code: getKeywordCode(lesson),
-    choices: getKeywordChoices(lesson),
-    answer: 0,
+    rawChoices: getKeywordChoices(lesson),
+    rawAnswer: 0,
     explainSummary: `C# keywords enforce strict type safety and compile-time contract verification.`,
     explainAnalogy: `Like setting a game object tag in the inspector so triggers only hit valid targets.`,
     explainMemory: `Compiler translates keywords into IL bytecode instructions without extra overhead.`,
@@ -96,16 +113,15 @@ function generateQuestionsForLesson(lesson, unit) {
   });
 
   // 6. Question 6: Memory Trace (Stack vs Heap & Allocations)
-  const q6Char = 'vikram';
-  questions.push({
-    character: q6Char,
+  rawQuestions.push({
+    character: 'vikram',
     charSpeech: `Show me the memory layout! Where does the runtime store this data?`,
     type: 'multiple_choice',
     title: `${lesson.title} - Memory & GC Trace`,
     instruction: `Where is this memory allocated during runtime?`,
     code: getMemoryCode(lesson),
-    choices: getMemoryChoices(lesson),
-    answer: 0,
+    rawChoices: getMemoryChoices(lesson),
+    rawAnswer: 0,
     explainSummary: `Value types live on the call stack; reference types allocate on the managed heap.`,
     explainAnalogy: `Stack is like your weapon in your hand; heap is the inventory storage chest.`,
     explainMemory: `STACK: Popped automatically on return (0 GC Alloc). HEAP: Managed by garbage collector.`,
@@ -113,16 +129,15 @@ function generateQuestionsForLesson(lesson, unit) {
   });
 
   // 7. Question 7: Performance & Optimization (The Pro Architect Way)
-  const q7Char = 'priya';
-  questions.push({
-    character: q7Char,
+  rawQuestions.push({
+    character: 'priya',
     charSpeech: `We are targeting 120 FPS on mobile! Which optimization is best here?`,
     type: 'multiple_choice',
     title: `${lesson.title} - Optimization & Zero-GC`,
     instruction: `Which approach produces the best performance and lowest garbage collection?`,
     code: getOptimizationCode(lesson),
-    choices: getOptimizationChoices(lesson),
-    answer: 0,
+    rawChoices: getOptimizationChoices(lesson),
+    rawAnswer: 0,
     explainSummary: `Caching object references and reusing data structures eliminates garbage collector pauses.`,
     explainAnalogy: `Reusing a bullet from an Object Pool instead of instantiating and destroying hundreds.`,
     explainMemory: `Maintains zero gen-0 GC heap allocations during active gameplay frames.`,
@@ -130,16 +145,15 @@ function generateQuestionsForLesson(lesson, unit) {
   });
 
   // 8. Question 8: Edge Case & Defensive Coding
-  const q8Char = 'dev';
-  questions.push({
-    character: q8Char,
+  rawQuestions.push({
+    character: 'dev',
     charSpeech: `What happens in the worst-case edge scenario? Let's stress-test it:`,
     type: 'multiple_choice',
     title: `${lesson.title} - Edge Case Handling`,
     instruction: `How should you defensively handle this potential edge case?`,
     code: getEdgeCaseCode(lesson),
-    choices: getEdgeCaseChoices(lesson),
-    answer: 0,
+    rawChoices: getEdgeCaseChoices(lesson),
+    rawAnswer: 0,
     explainSummary: `Defensive programming guards against edge conditions before executing operations.`,
     explainAnalogy: `Checking if the player is alive before trying to deduct damage or play hit animations.`,
     explainMemory: `Early returns skip stack frame setup and branch prediction misses.`,
@@ -147,16 +161,15 @@ function generateQuestionsForLesson(lesson, unit) {
   });
 
   // 9. Question 9: Multi-Step State Mutation Trace
-  const q9Char = 'kabir';
-  questions.push({
-    character: q9Char,
+  rawQuestions.push({
+    character: 'kabir',
     charSpeech: `Step through the execution! What are the final values after all statements run?`,
     type: 'multiple_choice',
     title: `${lesson.title} - State Mutation Trace`,
     instruction: `What is the final state after execution?`,
     code: getMutationCode(lesson),
-    choices: getMutationChoices(lesson),
-    answer: 0,
+    rawChoices: getMutationChoices(lesson),
+    rawAnswer: 0,
     explainSummary: `Variables mutate deterministically according to operator precedence and assignment order.`,
     explainAnalogy: `Simulating an inventory count after looting, using, and selling items.`,
     explainMemory: `Local stack variables mutate in place without heap overhead.`,
@@ -164,26 +177,42 @@ function generateQuestionsForLesson(lesson, unit) {
   });
 
   // 10. Question 10: Unit Mastery Challenge Drill
-  const q10Char = 'duo';
-  questions.push({
-    character: q10Char,
+  rawQuestions.push({
+    character: 'duo',
     charSpeech: `Mastery Challenge! Put everything together to prove your gamedev mastery:`,
     type: 'multiple_choice',
     title: `${lesson.title} - Architecture Mastery`,
     instruction: `Which statement represents the professional gamedev best practice for this topic?`,
     code: getMasteryCode(lesson),
-    choices: getMasteryChoices(lesson),
-    answer: 0,
+    rawChoices: getMasteryChoices(lesson),
+    rawAnswer: 0,
     explainSummary: `Professional Unity development balances clean OOP design with hardware-conscious performance.`,
     explainAnalogy: `Architecting game systems so your team can add 50 new weapons without rewriting code.`,
     explainMemory: `Clean decoupled code enables compiler vectorization and cache locality.`,
     pitfall: `Premature over-engineering vs unmaintainable spaghetti code.`
   });
 
-  return questions;
+  // Now shuffle choices for ALL questions with unique seeds!
+  return rawQuestions.map((q, idx) => {
+    const seed = (unit.unit * 1000) + (lessonIndex * 73) + (idx * 31) + 4242;
+    const { choices, answer } = shuffleChoices(q.rawChoices, q.rawAnswer, seed);
+    return {
+      character: q.character,
+      charSpeech: q.charSpeech,
+      type: q.type,
+      title: q.title,
+      instruction: q.instruction,
+      code: q.code,
+      choices: choices,
+      answer: answer,
+      explainSummary: q.explainSummary,
+      explainAnalogy: q.explainAnalogy,
+      explainMemory: q.explainMemory,
+      pitfall: q.pitfall
+    };
+  });
 }
 
-// Concrete code and choice generators per topic/lesson
 function getOutputCode(l) {
   if (l.topic === 'Variables' || l.topic === 'Logic' || l.topic === 'Loops') {
     return `int score = 100;\nint bonus = 50;\nscore += bonus * 2;\nConsole.WriteLine(score);`;
@@ -341,11 +370,11 @@ function getMasteryChoices(l) {
 // Assemble full curriculum with 10 questions per lesson
 let totalGenerated = 0;
 curriculum.forEach(unit => {
-  unit.lessons.forEach(lesson => {
-    lesson.questions = generateQuestionsForLesson(lesson, unit);
+  unit.lessons.forEach((lesson, lIdx) => {
+    lesson.questions = generateQuestionsForLesson(lesson, unit, lIdx);
     totalGenerated += lesson.questions.length;
   });
 });
 
 fs.writeFileSync('curriculum_data.json', JSON.stringify(curriculum, null, 2), 'utf8');
-console.log(`Successfully generated ${totalGenerated} questions across all ${curriculum.length} units and 100 lessons!`);
+console.log(`Successfully regenerated ${totalGenerated} questions across all ${curriculum.length} units with shuffled choices!`);

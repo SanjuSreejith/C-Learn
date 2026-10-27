@@ -449,9 +449,84 @@ function renderHeaderStats() {
   const freezeStatus = document.getElementById('right-freeze-status');
   if (freezeStatus) freezeStatus.textContent = \`🛡️ \${userState.freezes || 5} Freezes active\`;
 
+  renderStreakWidget();
   renderAIRadar();
   renderRightLeaguePreview();
   updatePathNodesStatus();
+}
+
+function renderStreakWidget() {
+  const streakCount = document.getElementById('right-streak-count');
+  const streakEl = document.getElementById('top-streak-val');
+  if (streakEl) streakEl.textContent = userState.streak;
+  if (streakCount) streakCount.textContent = \`\${userState.streak} Day\${userState.streak === 1 ? '' : 's'}\`;
+
+  const dotsContainer = document.getElementById('streak-calendar-dots');
+  if (!dotsContainer) return;
+
+  const today = new Date();
+  const dayOfWeek = (today.getDay() + 6) % 7; // Mon=0, Tue=1, Wed=2, etc.
+  const dayLabels = ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
+  const todayStr = today.toDateString();
+  const hasPracticedToday = (userState.lastStreakDate === todayStr);
+
+  let html = '';
+  dayLabels.forEach((label, idx) => {
+    let cls = 'streak-day-dot';
+    let icon = label;
+    if (idx < dayOfWeek) {
+      cls += ' completed';
+    } else if (idx === dayOfWeek) {
+      if (hasPracticedToday) {
+        cls += ' active-today';
+        icon = '🔥';
+      } else {
+        cls += ' today-pending';
+      }
+    }
+    html += \`<div class="\${cls}" title="\${idx === dayOfWeek ? (hasPracticedToday ? 'Streak active today!' : 'Practice today to keep your streak!') : ''}">\${icon}</div>\`;
+  });
+  dotsContainer.innerHTML = html;
+
+  const subtext = document.getElementById('streak-subtext');
+  if (subtext) {
+    subtext.innerHTML = hasPracticedToday
+      ? \`<span style="color:#e67e22; font-weight:700;">🔥 Today's streak is active! Practiced on \${today.toLocaleDateString('en-US', { weekday: 'long' })}.</span>\`
+      : \`<span style="color:#d97706; font-weight:700;">Complete 1 lesson today to extend your streak to \${userState.streak + 1} days! 🔥</span>\`;
+  }
+}
+
+function checkAndAwardDailyStreak() {
+  sfx.playCorrect();
+  const today = new Date();
+  const todayStr = today.toDateString();
+  if (userState.lastStreakDate !== todayStr) {
+    userState.streak = (userState.streak || 0) + 1;
+    userState.lastStreakDate = todayStr;
+    userState.xp = (userState.xp || 0) + 25;
+    saveState();
+    renderHeaderStats();
+    
+    if (window.confetti) {
+      confetti({ particleCount: 90, spread: 70, origin: { y: 0.5 } });
+    }
+
+    showToastDialog(
+      'Daily Streak Extended! 🔥',
+      \`Shabash! Today's streak is now active!\\n\\n🔥 Current Streak: \${userState.streak} Days!\\n⚡ Daily Streak Bonus: +25 XP\\n\\nPracticed on \${today.toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' })}!\`,
+      'Keep the Flame Burning!',
+      '🔥'
+    );
+
+    autoSaveToGitHub({ unit: 1, isSectionComplete: false });
+  } else {
+    showToastDialog(
+      'Streak Already Active Today! 🔥',
+      \`Your flame is burning bright for today (\${todayStr})!\\n\\n🔥 Streak: \${userState.streak} Days\\n\\nCome back tomorrow to keep the wildfire streak going!\`,
+      'Awesome!',
+      '🔥'
+    );
+  }
 }
 
 function renderAIRadar() {
@@ -644,10 +719,106 @@ function launchLesson(lessonId) {
     selectedChoice: null,
     startTimeMs: Date.now(),
     isDiagnostic: false,
-    activeExplainTab: 'summary'
+    activeExplainTab: 'summary',
+    inTeachMode: true
   };
 
   document.getElementById('lesson-modal').classList.add('active');
+  renderTeachScreen();
+}
+
+function renderTeachScreen() {
+  const lessonData = LESSONS_DATABASE[activeSession.lessonId];
+  const firstQ = activeSession.questions[0];
+  const charKey = firstQ.character === 'junior' ? 'kabir' : (firstQ.character || 'priya');
+  const char = CHARACTERS[charKey] || CHARACTERS.priya;
+
+  document.getElementById('lesson-progress-fill').style.width = '0%';
+  const isSuper = accountsDB[currentUsername].isPremium || userState.isPremium;
+  document.getElementById('lesson-hearts-count').textContent = isSuper ? '∞' : userState.hearts;
+
+  const drawer = document.getElementById('eval-drawer');
+  if (drawer) drawer.className = 'eval-drawer';
+
+  const highlightedCode = firstQ.code ? highlightCSharp(firstQ.code) : '';
+
+  const contentArea = document.getElementById('lesson-content-area');
+  contentArea.innerHTML = \`
+    <div class="lesson-top-character-wrapper" id="lesson-top-character">
+      <div class="lesson-top-avatar" id="lesson-top-avatar">
+        \${char.renderSVG('idle')}
+      </div>
+      <div class="lesson-top-bubble" id="lesson-top-bubble">
+        \${char.name.split(' ')[0]}: "Namaste! Before we begin the 10 practice drills, let's learn how <b>\${escapeHTML(lessonData.title)}</b> works in C# and Unity!"
+      </div>
+    </div>
+
+    <div class="concept-briefing-card">
+      <div class="concept-badge-row">
+        <span class="concept-unit-badge">UNIT \${lessonData.unit} · CONCEPT BRIEFING</span>
+        <span class="concept-topic-tag">📖 \${lessonData.topic}</span>
+      </div>
+      <h2 class="concept-title">\${escapeHTML(lessonData.title)}</h2>
+
+      <div class="concept-explanation-box">
+        <div class="concept-point">
+          <div class="point-icon">💡</div>
+          <div class="point-text">
+            <b>Syntax & Core Concept:</b>
+            <p>\${firstQ.explainSummary}</p>
+          </div>
+        </div>
+
+        <div class="concept-point">
+          <div class="point-icon">🎮</div>
+          <div class="point-text">
+            <b>In Unity Gamedev:</b>
+            <p>\${firstQ.explainAnalogy}</p>
+          </div>
+        </div>
+
+        <div class="concept-point">
+          <div class="point-icon">🧠</div>
+          <div class="point-text">
+            <b>Engine Memory & Architecture:</b>
+            <p><code>\${firstQ.explainMemory}</code></p>
+          </div>
+        </div>
+
+        <div class="concept-point">
+          <div class="point-icon">⚠️</div>
+          <div class="point-text">
+            <b>Common Pitfall to Avoid:</b>
+            <p>\${firstQ.pitfall}</p>
+          </div>
+        </div>
+      </div>
+
+      \${firstQ.code ? \`
+      <div style="margin-top:14px;">
+        <div style="font-size:12px; font-weight:800; color:var(--text-muted); margin-bottom:6px;">SYNTAX TEMPLATE:</div>
+        <div class="code-terminal-card" style="margin:0 0 16px;">
+          <div class="code-terminal-header">
+            <div class="term-dot red"></div>
+            <div class="term-dot yellow"></div>
+            <div class="term-dot green"></div>
+            <span class="term-title">GameLogic.cs</span>
+          </div>
+          <pre class="code-snippet-box"><code>\${highlightedCode}</code></pre>
+        </div>
+      </div>\` : ''}
+
+      <button class="btn-duo btn-duo-primary" style="width:100%; padding:14px; font-size:15px; margin-top:8px;" onclick="startDrillsAfterTeach()">
+        START PRACTICE DRILLS (10 QUESTIONS) 🚀
+      </button>
+    </div>
+  \`;
+}
+
+function startDrillsAfterTeach() {
+  sfx.playTap();
+  activeSession.inTeachMode = false;
+  activeSession.currentIndex = 0;
   renderCurrentQuestion();
 }
 
@@ -1817,12 +1988,38 @@ const htmlMarkup = `<!DOCTYPE html>
       font-size: 12px;
       font-weight: 800;
       color: var(--text-muted);
+      transition: all 0.25s ease;
     }
 
-    .streak-day-dot.active {
-      background: var(--accent-orange);
+    .streak-day-dot.completed {
+      background: #ff9600;
+      border-color: #e67e22;
       color: #ffffff;
       box-shadow: 0 3px 0 var(--accent-orange-dark);
+    }
+
+    .streak-day-dot.active-today {
+      background: linear-gradient(135deg, #ff9600 0%, #ff4b4b 100%);
+      color: #ffffff;
+      box-shadow: 0 0 14px rgba(255, 75, 75, 0.55);
+      animation: flamePulse 1.8s infinite ease-in-out;
+    }
+
+    .streak-day-dot.today-pending {
+      border: 2px dashed #ff9600;
+      background: rgba(255, 150, 0, 0.12);
+      color: #ff9600;
+      animation: flameRing 1.5s infinite alternate;
+    }
+
+    @keyframes flamePulse {
+      0%, 100% { transform: scale(1); box-shadow: 0 0 10px rgba(255, 75, 75, 0.4); }
+      50% { transform: scale(1.08); box-shadow: 0 0 18px rgba(255, 150, 0, 0.8); }
+    }
+
+    @keyframes flameRing {
+      0% { transform: scale(1); }
+      100% { transform: scale(1.06); }
     }
 
     .radar-bar-item { margin-bottom: 11px; }
@@ -2292,6 +2489,81 @@ const htmlMarkup = `<!DOCTYPE html>
       display: flex;
       flex-direction: column;
       box-sizing: border-box;
+    }
+
+    /* DUOLINGO TEACH-FIRST CONCEPT BRIEFING CARD */
+    .concept-briefing-card {
+      background: var(--card-bg);
+      border: 2px solid var(--card-border);
+      border-radius: 20px;
+      padding: 22px 24px;
+      box-shadow: 0 6px 0 var(--card-border-dark);
+      margin-bottom: 24px;
+      animation: fadeInCard 0.3s ease;
+    }
+    @keyframes fadeInCard {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .concept-badge-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 10px;
+    }
+    .concept-unit-badge {
+      font-size: 11px;
+      font-weight: 900;
+      color: var(--primary);
+      background: rgba(88, 204, 2, 0.14);
+      padding: 4px 10px;
+      border-radius: 6px;
+      letter-spacing: 0.6px;
+    }
+    .concept-topic-tag {
+      font-size: 12px;
+      font-weight: 800;
+      color: var(--text-muted);
+    }
+    .concept-title {
+      font-family: var(--font-display);
+      font-size: 24px;
+      font-weight: 800;
+      margin-bottom: 16px;
+      color: var(--text);
+    }
+    .concept-explanation-box {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      background: var(--bg-page);
+      border: 2px solid var(--card-border);
+      border-radius: 14px;
+      padding: 16px;
+      margin-bottom: 14px;
+    }
+    .concept-point {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+    }
+    .point-icon {
+      font-size: 20px;
+      line-height: 1.2;
+      flex-shrink: 0;
+    }
+    .point-text {
+      font-size: 13.5px;
+      line-height: 1.5;
+      color: var(--text);
+    }
+    .point-text b {
+      color: var(--text);
+      font-weight: 800;
+    }
+    .point-text p {
+      margin: 2px 0 0;
+      color: var(--text-muted);
     }
 
     /* TOP CHARACTER & SPEECH FEEDBACK IN LESSON */
@@ -3083,23 +3355,21 @@ const htmlMarkup = `<!DOCTYPE html>
     <div class="widget-card">
       <div class="widget-title-row">
         <div class="widget-title">🔥 Daily Streak</div>
-        <span style="font-weight: 800; font-size: 13.5px; color: var(--accent-orange);" id="right-streak-count">1 Day</span>
+        <span style="font-weight: 800; font-size: 13.5px; color: var(--accent-orange);" id="right-streak-count">2 Days</span>
       </div>
-      <p style="font-size: 12.5px; color: var(--text-muted); line-height: 1.4;">Solve at least 1 gamedev lesson every day to protect your streak!</p>
+      <p style="font-size: 12.5px; color: var(--text-muted); line-height: 1.4;" id="streak-subtext">Solve at least 1 gamedev lesson every day to protect your streak!</p>
       
-      <div class="streak-calendar-row">
-        <div class="streak-day-dot active">M</div>
-        <div class="streak-day-dot">T</div>
-        <div class="streak-day-dot">W</div>
-        <div class="streak-day-dot">T</div>
-        <div class="streak-day-dot">F</div>
-        <div class="streak-day-dot">S</div>
-        <div class="streak-day-dot">S</div>
+      <div class="streak-calendar-row" id="streak-calendar-dots">
+        <!-- Rendered dynamically by renderStreakWidget() -->
       </div>
 
       <div style="font-size: 11.5px; font-weight: 800; color: var(--secondary-dark); margin-top: 6px;" id="right-freeze-status">
         🛡️ 5 Streak Freezes active
       </div>
+
+      <button class="btn-duo btn-duo-secondary" style="width: 100%; margin-top: 10px; padding: 7px 10px; font-size: 12px;" onclick="checkAndAwardDailyStreak()">
+        🔥 Claim / Extend Today's Streak
+      </button>
     </div>
 
     <!-- WIDGET 2: AI KNOWLEDGE MATRIX (BKT & DECISION ENGINE) -->

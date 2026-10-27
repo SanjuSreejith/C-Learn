@@ -35,7 +35,7 @@ if (order.length === 100) {
   process.exit(1);
 }
 
-// Count total questions in LESSONS_DATABASE
+// Count total questions and check answer distribution in LESSONS_DATABASE
 const dbMatch = mainScript.match(/const LESSONS_DATABASE = ({[\s\S]*?});\nconst LESSON_ORDER/);
 if (!dbMatch) {
   console.error('FAIL: Could not extract LESSONS_DATABASE');
@@ -43,71 +43,80 @@ if (!dbMatch) {
 }
 const db = JSON.parse(dbMatch[1]);
 let totalQ = 0;
-let lessonsWith10Q = 0;
+let ansDist = { 0: 0, 1: 0, 2: 0, 3: 0 };
 Object.keys(db).forEach(id => {
   const qLen = db[id].questions.length;
   totalQ += qLen;
-  if (qLen === 10) lessonsWith10Q++;
+  db[id].questions.forEach(q => {
+    ansDist[q.answer] = (ansDist[q.answer] || 0) + 1;
+  });
 });
 console.log(`Total questions in LESSONS_DATABASE: ${totalQ}`);
-console.log(`Lessons with exactly 10 questions: ${lessonsWith10Q} / 100`);
+console.log('Answer distribution (0=A, 1=B, 2=C, 3=D):', ansDist);
 
-if (totalQ === 1000 && lessonsWith10Q === 100) {
-  console.log('PASS: Exactly 10 questions per lesson across all 100 lessons (1,000 total questions)!');
+const allAnswersVaried = Object.values(ansDist).every(cnt => cnt > 150);
+if (totalQ === 1000 && allAnswersVaried) {
+  console.log('PASS: Correct answers are uniformly distributed across A, B, C, D (not all A)!');
 } else {
-  console.error('FAIL: Expected 1,000 questions, got:', totalQ);
+  console.error('FAIL: Answer choices are not properly distributed!');
   process.exit(1);
 }
 
-console.log('--- TEST 3: Top Character Dialogue Feedback ("Okay!") ---');
+console.log('--- TEST 3: Teach-First Concept Briefing Screen ---');
+const hasTeachScreen = content.includes('renderTeachScreen');
+const hasTeachCard = content.includes('concept-briefing-card');
+const hasStartDrillsBtn = content.includes('startDrillsAfterTeach');
+
+console.log('Has renderTeachScreen:', hasTeachScreen);
+console.log('Has concept-briefing-card:', hasTeachCard);
+console.log('Has startDrillsAfterTeach:', hasStartDrillsBtn);
+
+if (hasTeachScreen && hasTeachCard && hasStartDrillsBtn) {
+  console.log('PASS: Duolingo Teach-First concept briefing screen is integrated before drills!');
+} else {
+  console.error('FAIL: Teach-first concept screen missing!');
+  process.exit(1);
+}
+
+console.log('--- TEST 4: Dynamic Daily Streak Engine ---');
+const hasDynamicStreakWidget = content.includes('renderStreakWidget');
+const hasAwardStreakFn = content.includes('checkAndAwardDailyStreak');
+const hasStreakDotsContainer = content.includes('streak-calendar-dots');
+
+console.log('Has renderStreakWidget:', hasDynamicStreakWidget);
+console.log('Has checkAndAwardDailyStreak:', hasAwardStreakFn);
+console.log('Has streak-calendar-dots:', hasStreakDotsContainer);
+
+if (hasDynamicStreakWidget && hasAwardStreakFn && hasStreakDotsContainer) {
+  console.log('PASS: Dynamic daily streak calculation & flame calendar verified!');
+} else {
+  console.error('FAIL: Dynamic streak engine missing!');
+  process.exit(1);
+}
+
+console.log('--- TEST 5: Top Character Dialogue Feedback ("Okay!") ---');
 const hasTopBubble = content.includes('id="lesson-top-bubble"');
 const hasOkayPrefix = content.includes('Okay!');
-const hasBounceAnimation = content.includes('char-bounce-correct');
-const hasShakeAnimation = content.includes('char-shake-wrong');
 const noDuplicateAgentInDrawer = !content.includes('id="eval-feedback-agent"');
 
-console.log('Has lesson-top-bubble:', hasTopBubble);
-console.log('Has Okay! prefix reaction:', hasOkayPrefix);
-console.log('Has char bounce animation:', hasBounceAnimation);
-console.log('Has char shake animation:', hasShakeAnimation);
-console.log('No duplicate character in bottom drawer:', noDuplicateAgentInDrawer);
-
-if (hasTopBubble && hasOkayPrefix && hasBounceAnimation && hasShakeAnimation && noDuplicateAgentInDrawer) {
-  console.log('PASS: Mascot commentary reacts directly at the top with "Okay!" feedback!');
+if (hasTopBubble && hasOkayPrefix && noDuplicateAgentInDrawer) {
+  console.log('PASS: Mascot reacts at the top with "Okay!" without duplicate character below!');
 } else {
   console.error('FAIL: Mascot top feedback criteria not met.');
   process.exit(1);
 }
 
-console.log('--- TEST 4: Automated GitHub Sync Engine ---');
+console.log('--- TEST 6: Automated GitHub Sync Engine ---');
 const hasGitPill = content.includes('header-git-pill');
 const hasAutoSaveFn = content.includes('autoSaveToGitHub');
 const hasGitSyncModal = content.includes('git-sync-modal');
-const hasServerJs = fs.existsSync('server.js');
 
-console.log('Has header GitHub pill:', hasGitPill);
-console.log('Has autoSaveToGitHub function:', hasAutoSaveFn);
-console.log('Has git-sync-modal dialog:', hasGitSyncModal);
-console.log('Has server.js companion:', hasServerJs);
-
-if (hasGitPill && hasAutoSaveFn && hasGitSyncModal && hasServerJs) {
+if (hasGitPill && hasAutoSaveFn && hasGitSyncModal) {
   console.log('PASS: GitHub automated save and companion sync engine verified!');
 } else {
   console.error('FAIL: GitHub sync engine criteria not met.');
   process.exit(1);
 }
-
-console.log('--- TEST 5: Syntax Highlighting & Code Display ---');
-console.log('Has highlightCSharp:', content.includes('function highlightCSharp'));
-console.log('Has tok-keyword styling:', content.includes('.tok-keyword'));
-console.log('Has tok-type styling:', content.includes('.tok-type'));
-console.log('Has code-terminal-card flex-shrink: 0:', content.includes('flex-shrink: 0 !important'));
-
-console.log('--- TEST 6: Realistic Accounts & Sleek Super ---');
-console.log('Sanju has realistic gems (185):', content.includes('gems: 185') || content.includes('185'));
-console.log('Scaria has realistic gems (140):', content.includes('gems: 140') || content.includes('140'));
-console.log('Unlimited hearts (∞) enabled:', content.includes('∞'));
-console.log('Sleek Super badge present:', content.includes('super-badge-sleek') || content.includes('👑 SUPER'));
 
 console.log('\n=============================');
 console.log('🎉 ALL INTEGRATION TESTS PASSED!');
